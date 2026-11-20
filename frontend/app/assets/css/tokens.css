@@ -87,6 +87,15 @@ input {
   color: inherit;
 }
 
+/* o texto não herda a cor de cabeçalhos escuros */
+input {
+  color: var(--color-text-primary);
+}
+
+input::placeholder {
+  color: var(--color-text-secondary);
+}
+
 button {
   cursor: pointer;
 }
