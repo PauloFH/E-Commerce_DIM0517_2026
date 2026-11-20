@@ -1,1 +1,6 @@
-{}
+{
+  "erros": {
+    "rede": "Could not reach the server. Check your connection and try again.",
+    "generico": "Something went wrong. Please try again."
+  }
+}

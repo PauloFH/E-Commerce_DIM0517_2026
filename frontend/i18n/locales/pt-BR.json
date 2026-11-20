@@ -1,1 +1,6 @@
-{}
+{
+  "erros": {
+    "rede": "Não foi possível falar com o servidor. Verifique sua conexão e tente novamente.",
+    "generico": "Algo deu errado. Tente novamente."
+  }
+}
