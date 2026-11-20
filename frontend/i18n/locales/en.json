@@ -7,6 +7,81 @@
     "pularConteudo": "Skip to content",
     "voce": "You are here"
   },
+  "idioma": {
+    "rotulo": "Language",
+    "sigla": "EN",
+    "paraEn": "Switch language to English",
+    "paraPt": "Switch language to Portuguese"
+  },
+  "nav": {
+    "principal": "Main navigation",
+    "inicio": "Home",
+    "vistos": "Recently viewed",
+    "carrinho": "Cart",
+    "vender": "Sell on kompraki",
+    "menu": "Menu",
+    "abrirMenu": "Open menu",
+    "fecharMenu": "Close menu"
+  },
+  "cabecalho": {
+    "carrinhoQtd": "Cart, no items | Cart, 1 item | Cart, {n} items",
+    "vendePergunta": "Selling on kompraki?",
+    "painelVendedor": "Seller dashboard"
+  },
+  "busca": {
+    "rotulo": "Search product by code",
+    "placeholder": "Enter the product code",
+    "botao": "Search",
+    "erro": "Enter a valid code: a whole number greater than zero."
+  },
+  "rodape": {
+    "comprar": "Shop",
+    "vender": "Sell",
+    "idioma": "Language",
+    "buscarCodigo": "Search by code",
+    "vistos": "Recently viewed",
+    "carrinho": "Cart",
+    "painel": "Seller dashboard",
+    "novoProduto": "New product",
+    "gerenciarEstoque": "Manage stock",
+    "copia": "© 2026 kompraki · Academic project for Configuration and Change Management (DIM0517 · UFRN)"
+  },
+  "produto": {
+    "cod": "Code",
+    "titulo": "Product {codigo}",
+    "precoFechamento": "Price at checkout",
+    "adicionar": "Add Product {codigo} to cart",
+    "adicionado": "Product {codigo} added to cart"
+  },
+  "selo": {
+    "emEstoque": "In stock",
+    "ultimas": "Last unit | Last {n} units",
+    "esgotado": "Out of stock",
+    "novo": "New"
+  },
+  "beneficios": {
+    "busca": {
+      "titulo": "Search by code",
+      "legenda": "Enter the code and see the stock right away"
+    },
+    "compra": {
+      "titulo": "Protected purchase",
+      "legenda": "If an item is missing, you are not charged"
+    },
+    "venda": {
+      "titulo": "Selling is simple",
+      "legenda": "Register products and control your stock"
+    }
+  },
+  "vendedor": {
+    "titulo": "Seller dashboard",
+    "legenda": "Register products and control your stock",
+    "menu": "Seller menu",
+    "visaoGeral": "Overview",
+    "novoProduto": "New product",
+    "gerenciarEstoque": "Manage stock",
+    "voltarLoja": "Back to the store"
+  },
   "erros": {
     "rede": "Could not reach the server. Check your connection and try again.",
     "generico": "Something went wrong. Please try again."

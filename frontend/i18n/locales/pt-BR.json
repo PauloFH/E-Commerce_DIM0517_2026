@@ -7,6 +7,81 @@
     "pularConteudo": "Pular para o conteúdo",
     "voce": "Você está em"
   },
+  "idioma": {
+    "rotulo": "Idioma",
+    "sigla": "PT",
+    "paraEn": "Mudar idioma para English",
+    "paraPt": "Mudar idioma para português"
+  },
+  "nav": {
+    "principal": "Navegação principal",
+    "inicio": "Início",
+    "vistos": "Vistos recentemente",
+    "carrinho": "Carrinho",
+    "vender": "Vender no kompraki",
+    "menu": "Menu",
+    "abrirMenu": "Abrir menu",
+    "fecharMenu": "Fechar menu"
+  },
+  "cabecalho": {
+    "carrinhoQtd": "Carrinho, nenhum item | Carrinho, 1 item | Carrinho, {n} itens",
+    "vendePergunta": "Vende no kompraki?",
+    "painelVendedor": "Painel do vendedor"
+  },
+  "busca": {
+    "rotulo": "Buscar produto pelo código",
+    "placeholder": "Digite o código do produto",
+    "botao": "Buscar",
+    "erro": "Digite um código válido: um número inteiro maior que zero."
+  },
+  "rodape": {
+    "comprar": "Comprar",
+    "vender": "Vender",
+    "idioma": "Idioma",
+    "buscarCodigo": "Buscar por código",
+    "vistos": "Vistos recentemente",
+    "carrinho": "Carrinho",
+    "painel": "Painel do vendedor",
+    "novoProduto": "Novo produto",
+    "gerenciarEstoque": "Gerenciar estoque",
+    "copia": "© 2026 kompraki · Projeto acadêmico de Gerência de Configuração e Mudanças (DIM0517 · UFRN)"
+  },
+  "produto": {
+    "cod": "Cód.",
+    "titulo": "Produto {codigo}",
+    "precoFechamento": "Preço no fechamento",
+    "adicionar": "Adicionar Produto {codigo} ao carrinho",
+    "adicionado": "Produto {codigo} adicionado ao carrinho"
+  },
+  "selo": {
+    "emEstoque": "Em estoque",
+    "ultimas": "Última unidade | Últimas {n} unidades",
+    "esgotado": "Esgotado",
+    "novo": "Novo"
+  },
+  "beneficios": {
+    "busca": {
+      "titulo": "Busca pelo código",
+      "legenda": "Digite o código e veja o estoque na hora"
+    },
+    "compra": {
+      "titulo": "Compra protegida",
+      "legenda": "Se faltar um item, nada é cobrado"
+    },
+    "venda": {
+      "titulo": "Vender é simples",
+      "legenda": "Cadastre produtos e controle o estoque"
+    }
+  },
+  "vendedor": {
+    "titulo": "Painel do vendedor",
+    "legenda": "Cadastre produtos e controle o estoque",
+    "menu": "Menu do vendedor",
+    "visaoGeral": "Visão geral",
+    "novoProduto": "Novo produto",
+    "gerenciarEstoque": "Gerenciar estoque",
+    "voltarLoja": "Voltar para a loja"
+  },
   "erros": {
     "rede": "Não foi possível falar com o servidor. Verifique sua conexão e tente novamente.",
     "generico": "Algo deu errado. Tente novamente."
