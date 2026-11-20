@@ -1,0 +1,150 @@
+{
+  "marca": {
+    "lema": "Easy shopping, shop here.",
+    "inicio": "kompraki, home page"
+  },
+  "geral": {
+    "pularConteudo": "Skip to content",
+    "voce": "You are here"
+  },
+  "idioma": {
+    "rotulo": "Language",
+    "sigla": "EN",
+    "paraEn": "Switch language to English",
+    "paraPt": "Switch language to Portuguese"
+  },
+  "nav": {
+    "principal": "Main navigation",
+    "inicio": "Home",
+    "vistos": "Recently viewed",
+    "carrinho": "Cart",
+    "vender": "Sell on kompraki",
+    "menu": "Menu",
+    "abrirMenu": "Open menu",
+    "fecharMenu": "Close menu"
+  },
+  "cabecalho": {
+    "carrinhoQtd": "Cart, no items | Cart, 1 item | Cart, {n} items",
+    "vendePergunta": "Selling on kompraki?",
+    "painelVendedor": "Seller dashboard"
+  },
+  "busca": {
+    "rotulo": "Search product by code",
+    "placeholder": "Enter the product code",
+    "botao": "Search",
+    "erro": "Enter a valid code: a whole number greater than zero."
+  },
+  "rodape": {
+    "comprar": "Shop",
+    "vender": "Sell",
+    "idioma": "Language",
+    "buscarCodigo": "Search by code",
+    "vistos": "Recently viewed",
+    "carrinho": "Cart",
+    "painel": "Seller dashboard",
+    "novoProduto": "New product",
+    "gerenciarEstoque": "Manage stock",
+    "copia": "© 2026 kompraki · Academic project for Configuration and Change Management (DIM0517 · UFRN)"
+  },
+  "produto": {
+    "cod": "Code",
+    "titulo": "Product {codigo}",
+    "precoFechamento": "Price at checkout",
+    "adicionar": "Add Product {codigo} to cart",
+    "adicionado": "Product {codigo} added to cart"
+  },
+  "selo": {
+    "emEstoque": "In stock",
+    "ultimas": "Last unit | Last {n} units",
+    "esgotado": "Out of stock",
+    "novo": "New"
+  },
+  "beneficios": {
+    "busca": {
+      "titulo": "Search by code",
+      "legenda": "Enter the code and see the stock right away"
+    },
+    "compra": {
+      "titulo": "Protected purchase",
+      "legenda": "If an item is missing, you are not charged"
+    },
+    "venda": {
+      "titulo": "Selling is simple",
+      "legenda": "Register products and control your stock"
+    }
+  },
+  "vendedor": {
+    "titulo": "Seller dashboard",
+    "legenda": "Register products and control your stock",
+    "menu": "Seller menu",
+    "visaoGeral": "Overview",
+    "novoProduto": "New product",
+    "gerenciarEstoque": "Manage stock",
+    "voltarLoja": "Back to the store"
+  },
+  "erros": {
+    "rede": "Could not reach the server. Check your connection and try again.",
+    "generico": "Something went wrong. Please try again."
+  },
+  "inicio": {
+    "seo": "Home",
+    "titulo1": "Easy shopping,",
+    "titulo2": "shop here.",
+    "texto": "Enter the product code in the search, check the stock right away and complete your purchase with all items at once.",
+    "buscar": "Search by code",
+    "vistosTitulo": "Recently viewed",
+    "vistosLegenda": "Products you looked up or registered in this browser",
+    "verTodos": "See all",
+    "vazioTitulo": "Nothing here yet",
+    "vazioTexto": "Products you look up or register in this browser show up here, so you can get back to them with one click.",
+    "vazioBotao": "Search for a product"
+  },
+  "painelProdutos": {
+    "seo": "Your products",
+    "titulo": "Your products",
+    "aviso": "Every new product starts with stock 0. After registering it, use Manage stock to add units.",
+    "tabela": "Products you looked up or registered in this browser",
+    "codigo": "Code",
+    "preco": "Price",
+    "estoque": "Stock",
+    "situacao": "Status",
+    "acoes": "Actions",
+    "repor": "Restock",
+    "reporProduto": "Restock Product {codigo}",
+    "baixa": "Remove stock",
+    "baixaProduto": "Remove stock from Product {codigo}",
+    "desconhecido": "—",
+    "situacaoDesconhecida": "Not checked",
+    "vazio": "No products here yet. Register a product or look up a code and it will show up in this list."
+  },
+  "paginas": {
+    "produto": {
+      "seo": "Product {codigo}",
+      "texto": "Here you will see the product's current stock and choose how many units to add to your cart."
+    },
+    "carrinho": {
+      "titulo": "Cart",
+      "texto": "Here you will review the chosen items, adjust quantities and complete the purchase at once."
+    },
+    "novoProduto": {
+      "titulo": "New product",
+      "texto": "Here you will register a product by entering its code and price. Every new product starts with stock 0."
+    },
+    "estoque": {
+      "titulo": "Manage stock",
+      "texto": "Here you will check a product's stock and record units coming in and going out."
+    }
+  },
+  "erroPagina": {
+    "rotulo": "Error {status}",
+    "legenda": "Error",
+    "titulo404": "Page not found",
+    "texto404": "The address may be wrong or the page no longer exists. Go back to the home page or search for a product by code.",
+    "tituloProduto": "Product not found",
+    "textoProduto": "We couldn't find a product with code {codigo}. Check the number and search again.",
+    "tituloFalha": "Something went wrong",
+    "textoFalha": "We had a problem opening this page. Try again in a moment or go back to the home page.",
+    "buscarOutro": "Search another code",
+    "voltar": "Back to home"
+  }
+}
