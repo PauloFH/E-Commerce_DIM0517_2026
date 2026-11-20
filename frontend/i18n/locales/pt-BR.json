@@ -85,5 +85,54 @@
   "erros": {
     "rede": "Não foi possível falar com o servidor. Verifique sua conexão e tente novamente.",
     "generico": "Algo deu errado. Tente novamente."
+  },
+  "inicio": {
+    "seo": "Início",
+    "titulo1": "Compra fácil,",
+    "titulo2": "compra aqui.",
+    "texto": "Digite o código do produto na busca, confira o estoque na hora e feche a compra com todos os itens de uma vez.",
+    "buscar": "Buscar pelo código",
+    "vistosTitulo": "Vistos recentemente",
+    "vistosLegenda": "Produtos que você consultou ou cadastrou neste navegador",
+    "verTodos": "Ver todos",
+    "vazioTitulo": "Nada por aqui ainda",
+    "vazioTexto": "Os produtos que você consultar ou cadastrar neste navegador aparecem aqui, para você voltar a eles com um clique.",
+    "vazioBotao": "Buscar um produto"
+  },
+  "painelProdutos": {
+    "seo": "Seus produtos",
+    "titulo": "Seus produtos",
+    "aviso": "Todo produto novo começa com estoque 0. Depois de cadastrar, use Gerenciar estoque para dar entrada.",
+    "tabela": "Produtos que você consultou ou cadastrou neste navegador",
+    "codigo": "Código",
+    "preco": "Preço",
+    "estoque": "Estoque",
+    "situacao": "Situação",
+    "acoes": "Ações",
+    "repor": "Repor",
+    "reporProduto": "Repor estoque do Produto {codigo}",
+    "baixa": "Dar baixa",
+    "baixaProduto": "Dar baixa no Produto {codigo}",
+    "desconhecido": "—",
+    "situacaoDesconhecida": "Não consultado",
+    "vazio": "Nenhum produto por aqui ainda. Cadastre um produto ou consulte um código para ele aparecer nesta lista."
+  },
+  "paginas": {
+    "produto": {
+      "seo": "Produto {codigo}",
+      "texto": "Aqui você vai ver o estoque atual do produto e escolher quantas unidades levar para o carrinho."
+    },
+    "carrinho": {
+      "titulo": "Carrinho",
+      "texto": "Aqui você vai revisar os itens escolhidos, ajustar as quantidades e fechar a compra de uma só vez."
+    },
+    "novoProduto": {
+      "titulo": "Novo produto",
+      "texto": "Aqui você vai cadastrar um produto informando o código e o preço. Todo produto novo começa com estoque 0."
+    },
+    "estoque": {
+      "titulo": "Gerenciar estoque",
+      "texto": "Aqui você vai consultar o estoque de um produto e registrar entradas e saídas de unidades."
+    }
   }
 }

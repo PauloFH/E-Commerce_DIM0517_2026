@@ -85,5 +85,54 @@
   "erros": {
     "rede": "Could not reach the server. Check your connection and try again.",
     "generico": "Something went wrong. Please try again."
+  },
+  "inicio": {
+    "seo": "Home",
+    "titulo1": "Easy shopping,",
+    "titulo2": "shop here.",
+    "texto": "Enter the product code in the search, check the stock right away and complete your purchase with all items at once.",
+    "buscar": "Search by code",
+    "vistosTitulo": "Recently viewed",
+    "vistosLegenda": "Products you looked up or registered in this browser",
+    "verTodos": "See all",
+    "vazioTitulo": "Nothing here yet",
+    "vazioTexto": "Products you look up or register in this browser show up here, so you can get back to them with one click.",
+    "vazioBotao": "Search for a product"
+  },
+  "painelProdutos": {
+    "seo": "Your products",
+    "titulo": "Your products",
+    "aviso": "Every new product starts with stock 0. After registering it, use Manage stock to add units.",
+    "tabela": "Products you looked up or registered in this browser",
+    "codigo": "Code",
+    "preco": "Price",
+    "estoque": "Stock",
+    "situacao": "Status",
+    "acoes": "Actions",
+    "repor": "Restock",
+    "reporProduto": "Restock Product {codigo}",
+    "baixa": "Remove stock",
+    "baixaProduto": "Remove stock from Product {codigo}",
+    "desconhecido": "—",
+    "situacaoDesconhecida": "Not checked",
+    "vazio": "No products here yet. Register a product or look up a code and it will show up in this list."
+  },
+  "paginas": {
+    "produto": {
+      "seo": "Product {codigo}",
+      "texto": "Here you will see the product's current stock and choose how many units to add to your cart."
+    },
+    "carrinho": {
+      "titulo": "Cart",
+      "texto": "Here you will review the chosen items, adjust quantities and complete the purchase at once."
+    },
+    "novoProduto": {
+      "titulo": "New product",
+      "texto": "Here you will register a product by entering its code and price. Every new product starts with stock 0."
+    },
+    "estoque": {
+      "titulo": "Manage stock",
+      "texto": "Here you will check a product's stock and record units coming in and going out."
+    }
   }
 }
