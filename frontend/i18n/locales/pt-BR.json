@@ -1,4 +1,12 @@
 {
+  "marca": {
+    "lema": "Compra fácil, compra aqui.",
+    "inicio": "kompraki, página inicial"
+  },
+  "geral": {
+    "pularConteudo": "Pular para o conteúdo",
+    "voce": "Você está em"
+  },
   "erros": {
     "rede": "Não foi possível falar com o servidor. Verifique sua conexão e tente novamente.",
     "generico": "Algo deu errado. Tente novamente."

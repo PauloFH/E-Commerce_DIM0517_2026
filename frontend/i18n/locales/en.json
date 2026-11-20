@@ -1,4 +1,12 @@
 {
+  "marca": {
+    "lema": "Easy shopping, shop here.",
+    "inicio": "kompraki, home page"
+  },
+  "geral": {
+    "pularConteudo": "Skip to content",
+    "voce": "You are here"
+  },
   "erros": {
     "rede": "Could not reach the server. Check your connection and try again.",
     "generico": "Something went wrong. Please try again."
