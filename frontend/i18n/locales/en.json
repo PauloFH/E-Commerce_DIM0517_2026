@@ -134,5 +134,17 @@
       "titulo": "Manage stock",
       "texto": "Here you will check a product's stock and record units coming in and going out."
     }
+  },
+  "erroPagina": {
+    "rotulo": "Error {status}",
+    "legenda": "Error",
+    "titulo404": "Page not found",
+    "texto404": "The address may be wrong or the page no longer exists. Go back to the home page or search for a product by code.",
+    "tituloProduto": "Product not found",
+    "textoProduto": "We couldn't find a product with code {codigo}. Check the number and search again.",
+    "tituloFalha": "Something went wrong",
+    "textoFalha": "We had a problem opening this page. Try again in a moment or go back to the home page.",
+    "buscarOutro": "Search another code",
+    "voltar": "Back to home"
   }
 }

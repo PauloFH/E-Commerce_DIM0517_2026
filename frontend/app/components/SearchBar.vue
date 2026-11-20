@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// id fixo por padrão porque focarBusca() procura a busca do cabeçalho; outras buscas passam o próprio id
+const props = withDefaults(defineProps<{ id?: string, placeholder?: string, contorno?: boolean }>(), { id: 'busca-codigo', placeholder: undefined })
 const { t } = useI18n()
 
 const entrada = ref<HTMLInputElement>()
@@ -21,24 +23,24 @@ defineExpose({ focar: () => entrada.value?.focus() })
 
 <template>
   <form class="busca" role="search" novalidate @submit.prevent="buscar">
-    <div class="campo" :class="{ comErro: erro }">
-      <label for="busca-codigo" class="visually-hidden">{{ t('busca.rotulo') }}</label>
+    <div class="campo" :class="{ comErro: erro, contorno }">
+      <label :for="id" class="visually-hidden">{{ t('busca.rotulo') }}</label>
       <input
-        id="busca-codigo"
+        :id="id"
         ref="entrada"
         v-model="valor"
         type="search"
         inputmode="numeric"
         autocomplete="off"
-        :placeholder="t('busca.placeholder')"
+        :placeholder="props.placeholder ?? t('busca.placeholder')"
         :aria-invalid="erro ? 'true' : undefined"
-        :aria-describedby="erro ? 'busca-erro' : undefined"
+        :aria-describedby="erro ? `${id}-erro` : undefined"
       >
       <button type="submit" class="botao" :aria-label="t('busca.botao')">
         <KIcon nome="busca" :tamanho="20" />
       </button>
     </div>
-    <p v-if="erro" id="busca-erro" class="erro" role="alert">{{ erro }}</p>
+    <p v-if="erro" :id="`${id}-erro`" class="erro" role="alert">{{ erro }}</p>
   </form>
 </template>
 
@@ -53,6 +55,7 @@ defineExpose({ focar: () => entrada.value?.focus() })
   background: var(--color-bg-surface);
 }
 
+.contorno { border: 1.5px solid var(--color-border-field); }
 .comErro { border-color: var(--color-border-danger); }
 
 input {

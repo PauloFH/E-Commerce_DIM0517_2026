@@ -134,5 +134,17 @@
       "titulo": "Gerenciar estoque",
       "texto": "Aqui você vai consultar o estoque de um produto e registrar entradas e saídas de unidades."
     }
+  },
+  "erroPagina": {
+    "rotulo": "Erro {status}",
+    "legenda": "Erro",
+    "titulo404": "Página não encontrada",
+    "texto404": "O endereço pode estar errado ou a página não existe mais. Volte para o início ou busque um produto pelo código.",
+    "tituloProduto": "Produto não encontrado",
+    "textoProduto": "Não encontramos um produto com o código {codigo}. Confira o número e busque de novo.",
+    "tituloFalha": "Algo deu errado",
+    "textoFalha": "Tivemos um problema para abrir esta página. Tente de novo em instantes ou volte para o início.",
+    "buscarOutro": "Buscar outro código",
+    "voltar": "Voltar para o início"
   }
 }
