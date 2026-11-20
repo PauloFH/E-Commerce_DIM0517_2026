@@ -1,0 +1,13 @@
+# ferramentas locais
+.omc/
+.idea/
+.vscode/
+*.iml
+# backend
+backend/target/
+# frontend
+frontend/node_modules/
+frontend/.nuxt/
+frontend/.output/
+# especificação da disciplina
+docs/
