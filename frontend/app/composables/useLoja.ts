@@ -9,6 +9,7 @@ export function useLoja() {
     try {
       return await $fetch<T>(url, {
         method: metodo,
+        timeout: 10_000, // sem isso uma API travada deixa a chamada pendente para sempre; vira erro de rede
         body: corpo,
         headers: { 'Accept-Language': locale.value }
       })
