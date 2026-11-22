@@ -5,15 +5,16 @@ const { t } = useI18n()
 
 const entrada = ref<HTMLInputElement>()
 const valor = ref('')
-const erro = ref('')
+// booleano, não o texto: a mensagem é traduzida no render e acompanha a troca de idioma
+const erro = ref(false)
 
 function buscar() {
   const texto = valor.value.trim()
   if (!/^[1-9]\d*$/.test(texto)) {
-    erro.value = t('busca.erro')
+    erro.value = true
     return
   }
-  erro.value = ''
+  erro.value = false
   valor.value = ''
   navigateTo(`/produto/${texto}`)
 }
@@ -40,7 +41,7 @@ defineExpose({ focar: () => entrada.value?.focus() })
         <KIcon nome="busca" :tamanho="20" />
       </button>
     </div>
-    <p v-if="erro" :id="`${id}-erro`" class="erro" role="alert">{{ erro }}</p>
+    <p v-if="erro" :id="`${id}-erro`" class="erro" role="alert">{{ t('busca.erro') }}</p>
   </form>
 </template>
 
