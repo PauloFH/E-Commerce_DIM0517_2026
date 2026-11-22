@@ -10,6 +10,7 @@ export function useCarrinho() {
     total: computed(() => totalItens(itens.value)),
     adicionar: (codigo: number, quantidade = 1) => { itens.value = adicionar(itens.value, codigo, quantidade) },
     alterarQuantidade: (codigo: number, quantidade: number) => { itens.value = alterarQuantidade(itens.value, codigo, quantidade) },
-    remover: (codigo: number) => { itens.value = remover(itens.value, codigo) }
+    remover: (codigo: number) => { itens.value = remover(itens.value, codigo) },
+    esvaziar: () => { itens.value = [] }
   }
 }
