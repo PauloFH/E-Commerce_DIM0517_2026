@@ -14,10 +14,10 @@ export function adicionar(itens: ItemCarrinho[], codigo: number, quantidade = 1)
   return [...itens, { codigo, quantidade }]
 }
 
-// quantidade <= 0 remove o item
+// quantidade que arredonda para baixo de 1 remove o item
 export function alterarQuantidade(itens: ItemCarrinho[], codigo: number, quantidade: number): ItemCarrinho[] {
-  if (!(quantidade > 0)) return remover(itens, codigo)
   const q = Math.floor(quantidade)
+  if (!(q > 0)) return remover(itens, codigo)
   return itens.map(i => (i.codigo === codigo ? { ...i, quantidade: q } : i))
 }
 

@@ -21,6 +21,8 @@ describe('carrinho', () => {
     expect(alterarQuantidade(itens, 1, 5)[0]).toEqual({ codigo: 1, quantidade: 5 })
     expect(alterarQuantidade(itens, 1, 0)).toEqual([{ codigo: 2, quantidade: 1 }])
     expect(alterarQuantidade(itens, 2, -3)).toEqual([{ codigo: 1, quantidade: 2 }])
+    expect(alterarQuantidade(itens, 2, 0.5)).toEqual([{ codigo: 1, quantidade: 2 }])
+    expect(alterarQuantidade(itens, 1, 2.9)[0]).toEqual({ codigo: 1, quantidade: 2 })
   })
 
   it('remove um item', () => {
