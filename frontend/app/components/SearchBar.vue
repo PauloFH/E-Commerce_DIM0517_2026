@@ -89,4 +89,7 @@ input:focus-visible { outline: none; }
   line-height: 18px;
   font-weight: 600;
 }
+
+/* com contorno a busca fica sobre fundo claro (página de erro), não sobre a cor da marca */
+.contorno + .erro { color: var(--color-text-danger); }
 </style>
