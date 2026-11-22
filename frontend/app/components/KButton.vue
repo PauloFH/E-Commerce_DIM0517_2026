@@ -3,7 +3,8 @@ const props = withDefaults(defineProps<{
   variante?: 'comprar' | 'primario' | 'secundario' | 'texto'
   disabled?: boolean
   to?: string
-}>(), { variante: 'primario', to: undefined })
+  type?: 'button' | 'submit' | 'reset'
+}>(), { variante: 'primario', to: undefined, type: 'button' })
 
 // link desabilitado não faz sentido: vira botão desabilitado
 const comoLink = computed(() => !!props.to && !props.disabled)
@@ -13,7 +14,7 @@ const comoLink = computed(() => !!props.to && !props.disabled)
   <NuxtLink v-if="comoLink" :to="to" class="botao" :class="variante">
     <slot />
   </NuxtLink>
-  <button v-else type="button" class="botao" :class="variante" :disabled="disabled">
+  <button v-else :type="type" class="botao" :class="variante" :disabled="disabled">
     <slot />
   </button>
 </template>

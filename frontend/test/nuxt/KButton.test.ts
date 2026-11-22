@@ -8,6 +8,12 @@ describe('KButton', () => {
     expect(c.find('button').exists()).toBe(true)
     expect(c.find('a').exists()).toBe(false)
     expect(c.text()).toBe('Comprar')
+    expect(c.find('button').attributes('type')).toBe('button')
+  })
+
+  it('aceita type="submit" para enviar formulários', async () => {
+    const c = await mountSuspended(KButton, { props: { type: 'submit' } })
+    expect(c.find('button').attributes('type')).toBe('submit')
   })
 
   it('renderiza link com "to"', async () => {
