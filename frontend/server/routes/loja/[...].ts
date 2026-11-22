@@ -5,5 +5,6 @@ export default defineEventHandler((event) => {
   if (!METODOS.has(event.method)) throw createError({ statusCode: 405 })
   const caminho = caminhoLoja(event.path)
   if (!caminho) throw createError({ statusCode: 400 })
-  return proxyRequest(event, `${useRuntimeConfig(event).apiBase}${caminho}`)
+  const base = String(useRuntimeConfig(event).apiBase).replace(/\/+$/, '')
+  return proxyRequest(event, `${base}${caminho}`)
 })
