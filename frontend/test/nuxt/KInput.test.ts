@@ -19,4 +19,9 @@ describe('KInput', () => {
     expect(input.attributes('aria-describedby')).toBe(mensagem.attributes('id'))
     expect(mensagem.text()).toBe('Valor inválido')
   })
+
+  it('mantém o aria-describedby de quem usa junto com o da mensagem de erro', async () => {
+    const c = await mountSuspended(KInput, { props: { label: 'Código', erro: 'Valor inválido' }, attrs: { 'aria-describedby': 'dica' } })
+    expect(c.find('input').attributes('aria-describedby')).toBe(`dica ${c.find('p').attributes('id')}`)
+  })
 })

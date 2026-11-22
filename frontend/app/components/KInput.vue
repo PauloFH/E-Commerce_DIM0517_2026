@@ -16,7 +16,7 @@ const id = useId()
       class="entrada"
       :class="{ comErro: erro }"
       :aria-invalid="erro ? 'true' : undefined"
-      :aria-describedby="erro ? `${id}-erro` : undefined"
+      :aria-describedby="[$attrs['aria-describedby'], erro && `${id}-erro`].filter(Boolean).join(' ') || undefined"
     >
     <p v-if="erro" :id="`${id}-erro`" class="erro" role="alert">{{ erro }}</p>
   </div>
