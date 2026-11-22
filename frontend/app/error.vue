@@ -11,7 +11,7 @@ useHead({ htmlAttrs: { lang: () => locale.value } })
 // 404 em /produto/... é "produto não encontrado"; outro 404 é página; o resto é falha
 const tipo = computed(() => {
   if (props.error.statusCode !== 404) return 'Falha'
-  return route.path.startsWith('/produto/') ? 'Produto' : '404'
+  return /^\/produto\/[^/]+\/?$/.test(route.path) ? 'Produto' : '404'
 })
 const codigo = computed(() => {
   const bruto = route.path.split('/')[2] ?? ''
