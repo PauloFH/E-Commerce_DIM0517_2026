@@ -80,6 +80,14 @@ produto/
       mapper/       Conversões MapStruct
     memoria/        Implementação volátil de ProdutoRepository
   config/           Composição dos beans Spring
+  BaixaDeEstoque    API pública do módulo, usada pela venda (sem Spring)
+venda/
+  dominio/excecao/  Exceção de negócio da venda
+  aplicacao/
+    dto/            Entradas com Jakarta Validation e resultado da venda
+    servico/        VendaService: valida, agrupa por código e baixa o estoque de uma vez
+  adaptador/api/    Interface Swagger, controller, DTOs HTTP e mapper MapStruct
+  config/           Composição dos beans Spring
 compartilhado/      Exceção-base de negócio, Jackson, handler global e schema de erro do OpenAPI
 ```
 
@@ -97,6 +105,7 @@ Código e preço devem ser positivos e a quantidade de entrada e de saída posit
 | `GET /loja/produto/{codigo}/estoque` | Código na rota | 200 somente com `codigo`, `estoque` | 400, 404 |
 | `PUT /loja/produto/{codigo}/entrada` | `quantidade` | 200 com `codigo`, `estoque` atualizado | 400, 404 |
 | `PUT /loja/produto/{codigo}/saida` | `quantidade` | 200 com `codigo`, `estoque` atualizado | 400, 404 |
+| `POST /loja/venda` | `itens`: lista de `codigo`, `quantidade` | 201 com `total` e `itens` (`codigo`, `quantidade`, `subtotal`, `estoque`) | 400, 404 |
 
 ```bash
 curl -i http://localhost:8080/loja/produto \
@@ -114,6 +123,20 @@ curl -X PUT http://localhost:8080/loja/produto/123/saida \
   -d '{"quantidade":10}'
 ```
 
+```bash
+curl -i http://localhost:8080/loja/venda \
+  -H 'Content-Type: application/json' \
+  -d '{"itens":[{"codigo":123,"quantidade":2},{"codigo":456,"quantidade":1}]}'
+```
+
+Com os produtos 123 (R$ 59,90, estoque 15) e 456 (R$ 69,90, estoque 8), a venda acima responde 201, sem `Location`:
+
+```json
+{"total":189.70,"itens":[{"codigo":123,"quantidade":2,"subtotal":119.80,"estoque":13},{"codigo":456,"quantidade":1,"subtotal":69.90,"estoque":7}]}
+```
+
+A venda baixa o estoque de cada item e calcula `subtotal = preço × quantidade` e `total = Σ subtotal`, em reais com duas casas (arredondamento `HALF_EVEN`). Ela é atômica: se qualquer item for inválido (lista ausente ou vazia, campo ausente, `"abc"`, `2.5`, quantidade ou código menor ou igual a zero), a quantidade passar do estoque (400, `produto.estoque.insuficiente`, com `argumentos` `[disponível, código]`) ou o produto não existir (404), nenhum estoque muda. Itens com o mesmo código têm as quantidades somadas e aparecem uma única vez na resposta, na ordem da primeira aparição, então o estoque nunca fica negativo. Erros de validação trazem `erros[].campo` com a linha, como `itens[1].quantidade`. A venda não é idempotente: repetir a chamada baixa o estoque novamente. O módulo `venda` usa somente `BaixaDeEstoque`, o pacote raiz público de `produto`; `ProdutoService` implementa essa interface e a baixa de todos os itens ocorre em uma única chamada ao repositório.
+
 Reposição não é idempotente: repetir a chamada soma novamente. O limite de estoque é `2147483647`; ultrapassá-lo retorna 400 sem alteração. A saída também não é idempotente: repetir a chamada subtrai novamente. Quantidade maior que o estoque retorna 400 (`produto.estoque.insuficiente`) sem alteração, então o estoque nunca fica negativo; levar o estoque a zero é permitido. Código duplicado retorna 409 sem sobrescrever; código ausente retorna 404.
 
 O `GlobalHttpExceptionHandler` centraliza os erros de todos os módulos. As exceções de domínio estendem `ExcecaoNegocio`, contrato público em Java puro de `compartilhado`, e o handler converte suas categorias em status HTTP sem acessar o interior de produto.
@@ -126,7 +149,7 @@ Erros usam `application/problem+json`, com `type: about:blank`, `title`, `status
 
 O adaptador em memória usa um único monitor em todas as operações, inclusive leituras, impedindo observar uma baixa parcial. Atualizações substituem produtos imutáveis. Um futuro adaptador de banco deverá preservar os mesmos contratos e garantir atomicidade entre instâncias.
 
-**Os dados são perdidos ao reiniciar. Cada instância da API possui seu próprio estoque.** Venda, persistência durável, listagem, edição e exclusão não estão incluídas nesta entrega.
+**Os dados são perdidos ao reiniciar. Cada instância da API possui seu próprio estoque.** Persistência durável, listagem, edição e exclusão não estão incluídas nesta entrega.
 
 ## Frontend
 
