@@ -13,8 +13,12 @@ useHead({ title: () => `${titulo.value} · kompraki` })
 <template>
   <div class="pagina">
     <KBreadcrumb :itens="[{ texto: t('nav.inicio'), to: '/' }, { texto: titulo }]" />
-    <h1 class="heading-lg">{{ titulo }}</h1>
-    <p class="body">{{ t('paginas.produto.texto') }}</p>
+    <h1 class="heading-lg">
+      {{ titulo }}
+    </h1>
+    <p class="body">
+      {{ t('paginas.produto.texto') }}
+    </p>
   </div>
 </template>
 

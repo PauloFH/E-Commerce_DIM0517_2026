@@ -11,10 +11,21 @@ const comoLink = computed(() => !!props.to && !props.disabled)
 </script>
 
 <template>
-  <NuxtLink v-if="comoLink" :to="to" class="botao" :class="variante">
+  <NuxtLink
+    v-if="comoLink"
+    :to="to"
+    class="botao"
+    :class="variante"
+  >
     <slot />
   </NuxtLink>
-  <button v-else :type="type" class="botao" :class="variante" :disabled="disabled">
+  <button
+    v-else
+    :type="type"
+    class="botao"
+    :class="variante"
+    :disabled="disabled"
+  >
     <slot />
   </button>
 </template>

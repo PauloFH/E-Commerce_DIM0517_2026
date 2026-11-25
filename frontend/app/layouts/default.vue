@@ -4,9 +4,15 @@ const { t } = useI18n()
 
 <template>
   <div>
-    <a href="#conteudo" class="visually-hidden pular">{{ t('geral.pularConteudo') }}</a>
+    <a
+      href="#conteudo"
+      class="visually-hidden pular"
+    >{{ t('geral.pularConteudo') }}</a>
     <AppHeader />
-    <main id="conteudo" class="container principal">
+    <main
+      id="conteudo"
+      class="container principal"
+    >
       <slot />
     </main>
     <AppFooter />
@@ -17,5 +23,4 @@ const { t } = useI18n()
 .principal {
   padding-block: var(--spacing-8) var(--spacing-12);
 }
-
 </style>

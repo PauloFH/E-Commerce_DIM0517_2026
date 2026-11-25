@@ -3,7 +3,11 @@ defineProps<{ tipo: 'sucesso' | 'info' | 'atencao' | 'erro' }>()
 </script>
 
 <template>
-  <div class="alerta" :class="tipo" :role="tipo === 'erro' ? 'alert' : 'status'">
+  <div
+    class="alerta"
+    :class="tipo"
+    :role="tipo === 'erro' ? 'alert' : 'status'"
+  >
     <slot />
   </div>
 </template>

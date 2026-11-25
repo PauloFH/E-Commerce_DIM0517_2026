@@ -5,7 +5,7 @@ describe('normalizarErro', () => {
   it('lê o ProblemDetail da resposta', () => {
     const erro = { response: {}, status: 409, data: { status: 409, title: 'Conflito', detail: 'Estoque insuficiente', codigoErro: 'ESTOQUE_INSUFICIENTE' } }
     expect(normalizarErro(erro, 'rede', 'generico')).toEqual({
-      status: 409, title: 'Conflito', detail: 'Estoque insuficiente', codigoErro: 'ESTOQUE_INSUFICIENTE'
+      status: 409, title: 'Conflito', detail: 'Estoque insuficiente', codigoErro: 'ESTOQUE_INSUFICIENTE',
     })
   })
 

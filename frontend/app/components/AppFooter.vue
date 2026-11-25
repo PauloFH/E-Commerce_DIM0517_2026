@@ -7,20 +7,44 @@ const { t, locale, locales, setLocale } = useI18n()
     <div class="topo">
       <div class="marca">
         <KLogo fundo="escuro" />
-        <p class="body">{{ t('marca.lema') }}</p>
+        <p class="body">
+          {{ t('marca.lema') }}
+        </p>
       </div>
 
-      <nav class="coluna" :aria-label="t('rodape.comprar')">
-        <h2 class="label">{{ t('rodape.comprar') }}</h2>
+      <nav
+        class="coluna"
+        :aria-label="t('rodape.comprar')"
+      >
+        <h2 class="label">
+          {{ t('rodape.comprar') }}
+        </h2>
         <ul>
-          <li><button type="button" @click="focarBusca">{{ t('rodape.buscarCodigo') }}</button></li>
-          <li><NuxtLink to="/#vistos" aria-current-value="false">{{ t('rodape.vistos') }}</NuxtLink></li>
+          <li>
+            <button
+              type="button"
+              @click="focarBusca"
+            >
+              {{ t('rodape.buscarCodigo') }}
+            </button>
+          </li>
+          <li>
+            <NuxtLink
+              to="/#vistos"
+              aria-current-value="false"
+            >{{ t('rodape.vistos') }}</NuxtLink>
+          </li>
           <li><NuxtLink to="/carrinho">{{ t('rodape.carrinho') }}</NuxtLink></li>
         </ul>
       </nav>
 
-      <nav class="coluna" :aria-label="t('rodape.vender')">
-        <h2 class="label">{{ t('rodape.vender') }}</h2>
+      <nav
+        class="coluna"
+        :aria-label="t('rodape.vender')"
+      >
+        <h2 class="label">
+          {{ t('rodape.vender') }}
+        </h2>
         <ul>
           <li><NuxtLink to="/vendedor">{{ t('rodape.painel') }}</NuxtLink></li>
           <li><NuxtLink to="/vendedor/produtos/novo">{{ t('rodape.novoProduto') }}</NuxtLink></li>
@@ -29,10 +53,20 @@ const { t, locale, locales, setLocale } = useI18n()
       </nav>
 
       <div class="coluna">
-        <h2 class="label">{{ t('rodape.idioma') }}</h2>
+        <h2 class="label">
+          {{ t('rodape.idioma') }}
+        </h2>
         <ul>
-          <li v-for="l in locales" :key="l.code">
-            <button type="button" :lang="l.code" :aria-pressed="l.code === locale" @click="setLocale(l.code)">
+          <li
+            v-for="l in locales"
+            :key="l.code"
+          >
+            <button
+              type="button"
+              :lang="l.code"
+              :aria-pressed="l.code === locale"
+              @click="setLocale(l.code)"
+            >
               {{ l.name }}
             </button>
           </li>
@@ -41,7 +75,9 @@ const { t, locale, locales, setLocale } = useI18n()
     </div>
 
     <hr>
-    <p class="caption copia">{{ t('rodape.copia') }}</p>
+    <p class="caption copia">
+      {{ t('rodape.copia') }}
+    </p>
   </footer>
 </template>
 

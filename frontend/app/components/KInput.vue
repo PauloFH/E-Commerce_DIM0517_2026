@@ -8,7 +8,10 @@ const id = useId()
 
 <template>
   <div class="campo">
-    <label :for="id" class="rotulo">{{ label }}</label>
+    <label
+      :for="id"
+      class="rotulo"
+    >{{ label }}</label>
     <input
       v-bind="$attrs"
       :id="id"
@@ -18,7 +21,14 @@ const id = useId()
       :aria-invalid="erro ? 'true' : undefined"
       :aria-describedby="[$attrs['aria-describedby'], erro && `${id}-erro`].filter(Boolean).join(' ') || undefined"
     >
-    <p v-if="erro" :id="`${id}-erro`" class="erro" role="alert">{{ erro }}</p>
+    <p
+      v-if="erro"
+      :id="`${id}-erro`"
+      class="erro"
+      role="alert"
+    >
+      {{ erro }}
+    </p>
   </div>
 </template>
 

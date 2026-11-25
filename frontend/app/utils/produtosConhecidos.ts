@@ -14,7 +14,7 @@ const numeroValido = (v: unknown): v is number => typeof v === 'number' && Numbe
 export function registrar(
   mapa: MapaProdutos,
   parcial: { codigo: number, preco?: number, estoque?: number },
-  agora = Date.now()
+  agora = Date.now(),
 ): MapaProdutos {
   const atual = mapa[parcial.codigo]
   const novo: ProdutoConhecido = { ...atual, codigo: parcial.codigo, vistoEm: agora }
