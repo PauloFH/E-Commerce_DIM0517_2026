@@ -9,6 +9,7 @@ import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoJaExisteException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoNaoEncontradoException;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.util.Objects;
 
@@ -16,6 +17,20 @@ import java.util.Objects;
 public final class ProdutoService {
     private final ProdutoRepository repository;
     private final Validator validator;
+
+    /**
+     * Cria o serviço fora do Spring com o Validator padrão do Jakarta Validation,
+     * compartilhado por todas as instâncias criadas assim.
+     * @param repository porta de armazenamento
+     */
+    public ProdutoService(ProdutoRepository repository) {
+        this(repository, ValidatorPadrao.INSTANCIA);
+    }
+
+    /** Uma única factory por processo, criada só no primeiro uso do construtor sem Validator. */
+    private static final class ValidatorPadrao {
+        private static final Validator INSTANCIA = Validation.buildDefaultValidatorFactory().getValidator();
+    }
 
     /**
      * Recebe as dependências usadas também em chamadas fora do Spring.

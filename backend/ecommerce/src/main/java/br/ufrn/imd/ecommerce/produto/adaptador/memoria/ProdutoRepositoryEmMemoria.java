@@ -2,16 +2,17 @@ package br.ufrn.imd.ecommerce.produto.adaptador.memoria;
 
 import br.ufrn.imd.ecommerce.produto.aplicacao.porta.ProdutoRepository;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Armazenamento volátil com exclusão mútua entre todas as operações.
  * A atomicidade vale somente para esta instância; reiniciar o processo apaga os dados.
  */
 public final class ProdutoRepositoryEmMemoria implements ProdutoRepository {
-    private final Map<Integer, Produto> produtos = new ConcurrentHashMap<>();
+    // HashMap basta: todo acesso passa pelo monitor desta instância (synchronized).
+    private final Map<Integer, Produto> produtos = new HashMap<>();
 
     /** Cria um armazenamento vazio, sem dependências externas. */
     public ProdutoRepositoryEmMemoria() {
