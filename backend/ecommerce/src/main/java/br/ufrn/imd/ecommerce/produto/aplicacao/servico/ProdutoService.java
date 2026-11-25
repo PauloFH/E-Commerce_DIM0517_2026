@@ -19,12 +19,17 @@ public final class ProdutoService {
     private final Validator validator;
 
     /**
-     * Cria o serviço fora do Spring com o Validator padrão do Jakarta Validation.
-     * Cada chamada monta uma factory que não é fechada; o Spring usa o outro construtor.
+     * Cria o serviço fora do Spring com o Validator padrão do Jakarta Validation,
+     * compartilhado por todas as instâncias criadas assim.
      * @param repository porta de armazenamento
      */
     public ProdutoService(ProdutoRepository repository) {
-        this(repository, Validation.buildDefaultValidatorFactory().getValidator());
+        this(repository, ValidatorPadrao.INSTANCIA);
+    }
+
+    /** Uma única factory por processo, criada só no primeiro uso do construtor sem Validator. */
+    private static final class ValidatorPadrao {
+        private static final Validator INSTANCIA = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     /**
