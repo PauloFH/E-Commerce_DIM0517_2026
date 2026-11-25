@@ -42,16 +42,16 @@ produto/
       mapper/       Conversões MapStruct
     memoria/        Implementação volátil de ProdutoRepository
   config/           Composição dos beans Spring
-compartilhado/      Exceção-base de negócio, Jackson e handler global
+compartilhado/      Exceção-base de negócio, Jackson, handler global e schema de erro do OpenAPI
 ```
 
-O serviço não depende de Spring, HTTP ou armazenamento concreto. Recebe `ProdutoRepository` e `jakarta.validation.Validator` no construtor e executa validações também em chamadas diretas, sem contexto Spring. Para testes independentes, criar o Validator com `Validation.buildDefaultValidatorFactory()` e encerrar essa factory ao final.
+O serviço não depende de Spring, HTTP ou armazenamento concreto. Recebe `ProdutoRepository` e `jakarta.validation.Validator` no construtor e executa validações também em chamadas diretas, sem contexto Spring. Fora do Spring, `new ProdutoService(new ProdutoRepositoryEmMemoria())` usa o Validator padrão do Jakarta Validation.
 
 Os DTOs HTTP são convertidos em entradas da aplicação pelo MapStruct; não são compartilhados com o serviço. Mappings HTTP e documentação Swagger ficam em `ProdutoApi`; `ProdutoController` implementa esse contrato. O domínio contém somente `codigo` (`Integer`), `preco` (`BigDecimal`) e `estoque` (`Integer`).
 
 ## Contrato HTTP
 
-Código e preço devem ser positivos e a quantidade de reposição positiva. O cadastro recebe somente código e preço e sempre cria o produto com estoque zero. Todos os campos de cada requisição são obrigatórios. Valores monetários são expressos em reais; estoque e quantidade em unidades inteiras. Campos inteiros JSON não aceitam decimais, strings ou booleanos, mesmo strings numéricas como `"10"`.
+Código e preço devem ser positivos e a quantidade de reposição positiva. O cadastro recebe somente código e preço e sempre cria o produto com estoque zero. Todos os campos de cada requisição são obrigatórios. Valores monetários são expressos em reais; estoque e quantidade em unidades inteiras. Campos inteiros JSON não aceitam decimais, strings ou booleanos, mesmo strings numéricas como `"10"`; o `preco` também não aceita strings nem booleanos, como `"59.90"`.
 
 | Operação | Entrada | Sucesso | Erros |
 |---|---|---|---|
@@ -75,13 +75,13 @@ Reposição não é idempotente: repetir a chamada soma novamente. O limite de e
 
 O `GlobalHttpExceptionHandler` centraliza os erros de todos os módulos. As exceções de domínio estendem `ExcecaoNegocio`, contrato público em Java puro de `compartilhado`, e o handler converte suas categorias em status HTTP sem acessar o interior de produto.
 
-Erros usam `application/problem+json`, com `type: about:blank`, `title`, `status`, `detail` (chave de mensagem) e `instance` (caminho da requisição). Exceções de negócio incluem `argumentos`; validações incluem `erros` com `campo` e `chave`, sem publicar valores rejeitados. A tradução das chaves fica para uma entrega futura.
+Erros usam `application/problem+json`, com `type: about:blank`, `title`, `status`, `detail` (chave de mensagem) e `instance` (caminho da requisição). Exceções de negócio incluem `argumentos`; validações incluem `erros` com `campo` e `chave`, sem publicar valores rejeitados. No OpenAPI esse formato aparece como o schema `Problema`. A tradução das chaves fica para uma entrega futura.
 
 ## Armazenamento
 
 `ProdutoRepository` define consulta, inserção sem sobrescrita, soma atômica e baixa em lote. Na baixa, produto ausente ou estoque insuficiente retorna `false` sem alterar nenhum item; mapa vazio retorna `true`. A porta recebe produtos válidos, códigos positivos, quantidades positivas e nenhum valor nulo.
 
-O adaptador em memória usa `ConcurrentHashMap` e um único monitor em todas as operações, inclusive leituras, impedindo observar uma baixa parcial. Atualizações substituem produtos imutáveis. Um futuro adaptador de banco deverá preservar os mesmos contratos e garantir atomicidade entre instâncias.
+O adaptador em memória usa um único monitor em todas as operações, inclusive leituras, impedindo observar uma baixa parcial. Atualizações substituem produtos imutáveis. Um futuro adaptador de banco deverá preservar os mesmos contratos e garantir atomicidade entre instâncias.
 
 **Os dados são perdidos ao reiniciar. Cada instância da API possui seu próprio estoque.** Venda, persistência durável, listagem, edição e exclusão não estão incluídas nesta entrega.
 
