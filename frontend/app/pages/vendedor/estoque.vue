@@ -63,12 +63,12 @@ async function consultar() {
   limparMensagens()
   // o formulário de reposição some até o novo produto carregar, para nunca repor no anterior
   produto.value = undefined
-  const resultado = validarCodigo(codigo.value)
-  if ('erro' in resultado) {
-    erroCodigo.value = resultado.erro
+  const invalido = validarCodigo(codigo.value)
+  if (invalido) {
+    erroCodigo.value = { chave: invalido === 'obrigatorio' ? 'paginas.estoque.erros.codigoVazio' : 'paginas.estoque.erros.codigoInvalido' }
     return
   }
-  const numero = resultado.valor
+  const numero = Number(codigo.value.trim())
   const consulta = ++ultimaConsulta
   ocupado.value = true
   try {
@@ -104,9 +104,10 @@ async function repor() {
     quantidade.value = ''
   }
   catch (erro) {
-    if ((erro as ProblemDetail).status === 400) {
-      // sem os erros por campo no ProblemDetail, o único 400 possível aqui é o estouro do limite
-      erroQuantidade.value = { chave: 'paginas.estoque.erros.quantidadeLimite' }
+    const problema = erro as ProblemDetail
+    if (problema.status === 400) {
+      // com a quantidade já validada aqui, um 400 sem erros por campo é o estouro do limite de estoque
+      erroQuantidade.value = { chave: problema.erros?.length ? 'paginas.estoque.erros.quantidadeInvalida' : 'paginas.estoque.erros.quantidadeLimite' }
     }
     else {
       tratarFalha(erro, numero)

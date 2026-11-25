@@ -13,13 +13,6 @@ function lerInteiroPositivo(texto: string): number | null {
   return numero > 0 ? numero : null
 }
 
-export function validarCodigo(texto: string): { valor: number } | { erro: ErroCampo } {
-  if (!texto.trim()) return { erro: { chave: 'paginas.estoque.erros.codigoVazio' } }
-  const valor = lerInteiroPositivo(texto)
-  if (valor === null || valor > LIMITE_ESTOQUE) return { erro: { chave: 'paginas.estoque.erros.codigoInvalido' } }
-  return { valor }
-}
-
 export function validarQuantidade(texto: string): { valor: number } | { erro: ErroCampo } {
   const valor = lerInteiroPositivo(texto)
   if (valor === null) return { erro: { chave: 'paginas.estoque.erros.quantidadeInvalida' } }
