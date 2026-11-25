@@ -1,32 +1,67 @@
 # E-Commerce DIM0517 2026
 
+[![CI](https://github.com/PauloFH/E-Commerce_DIM0517_2026/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/PauloFH/E-Commerce_DIM0517_2026/actions/workflows/ci.yml)
+
 Sistema simples de controle de produtos e estoque de uma loja virtual, feito para a disciplina de Gerência de Configuração e Mudanças (DIM0517) da UFRN.
 
 ## Participantes
 
 Emanuel Kywal Pinto Cabral Filho e Paulo Roberto Fernandes Holanda
 
-## Backend
+## Ferramentas necessárias
 
-O backend é feito em Spring Boot 4 e usa o Java 25. Não é preciso instalar o Maven: o Maven Wrapper (`mvnw`) já vem no projeto. No Linux e no macOS, o `mvnw` precisa do `unzip` (no Ubuntu/WSL, `sudo apt install unzip`), porque confere o Maven baixado com o SHA-256 do `.zip`. Para subir a API:
+| Ferramenta | Versão | Para quê |
+|---|---|---|
+| [Git](https://git-scm.com) | qualquer recente | Versionamento e hook de pre-commit |
+| [mise](https://mise.jdx.dev) | qualquer recente | Instala as versões abaixo a partir do `mise.toml` (recomendado) |
+| JDK ([Temurin](https://adoptium.net)) | 25 | Backend |
+| [Node.js](https://nodejs.org) | 24 | Nuxt e Vitest |
+| [Bun](https://bun.sh) | 1.4.5 | Dependências e scripts do front |
+| [just](https://just.systems) | 1.59 | Comandos do projeto |
+| `unzip` | qualquer | O `mvnw` confere o Maven baixado (Linux, macOS e WSL) |
+
+Com o mise, depois de clonar:
 
 ```bash
-cd backend/ecommerce
-./mvnw spring-boot:run
+mise trust
+mise install
+just instalar
 ```
 
-No Windows, use `mvnw.cmd spring-boot:run` no lugar de `./mvnw spring-boot:run` (os demais comandos abaixo seguem a mesma troca).
+Sem o mise, instale o JDK 25, o Node 24, o Bun 1.4.5 e o just pelo gerenciador do seu sistema, e deixe o JDK 25 no `JAVA_HOME` (o `mvnw` usa o Java de lá). O Maven não precisa ser instalado: o Maven Wrapper já vem no projeto.
+
+## Comandos
+
+Os comandos do dia a dia estão no `justfile` da raiz. O CI usa os mesmos comandos.
+
+| Comando | O que faz |
+|---|---|
+| `just` | Lista os comandos |
+| `just instalar` | Instala as dependências do front e ativa o hook de pre-commit (rode uma vez depois de clonar) |
+| `just api` | Sobe a API em `http://localhost:8080` |
+| `just front` | Sobe o front em `http://localhost:3000` |
+| `just formatar` | Formata back e front (`formatar-back` e `formatar-front` fazem um lado só) |
+| `just verificar` | Roda o mesmo que o CI (`verificar-back` e `verificar-front` fazem um lado só) |
+| `just testar-back` / `just testar-front` | Só os testes |
+
+## Backend
+
+O backend é feito em Spring Boot 4 e usa o Java 25; no Windows, o `just` chama o `mvnw.cmd`. Para subir a API:
+
+```bash
+just api
+```
 
 A API abre em `http://localhost:8080`, sem banco ou Docker. A primeira execução baixa o Maven e as dependências, então precisa de acesso à internet.
 
 - Swagger UI: http://localhost:8080/swagger-ui/index.html
 - OpenAPI JSON: http://localhost:8080/v3/api-docs
 
-Outros comandos úteis: `./mvnw verify` compila e roda os testes, e `./mvnw javadoc:javadoc -Ddoclint=all` gera o Javadoc em `target/reports/apidocs/index.html`.
+Outros comandos úteis: `just verificar-back` compila, roda os testes e confere a formatação e a cobertura mínima; `just formatar-back` formata o código; e `./mvnw javadoc:javadoc -Ddoclint=all`, dentro de `backend/ecommerce`, gera o Javadoc em `target/reports/apidocs/index.html`.
 
 ## Arquitetura
 
-Cada pacote imediatamente abaixo de `br.ufrn.imd.ecommerce` representa um módulo do Spring Modulith. Os testes verificam as fronteiras entre `produto` e `compartilhado`, além das dependências entre camadas.
+Cada pacote imediatamente abaixo de `br.ufrn.imd.ecommerce` representa um módulo do Spring Modulith. Os testes verificam as fronteiras entre os módulos e as dependências entre camadas (ver [Padrões do projeto](#padrões-do-projeto)).
 
 ```text
 produto/
@@ -93,15 +128,26 @@ O adaptador em memória usa um único monitor em todas as operações, inclusive
 O front é feito em Nuxt 4 e usa o [Bun](https://bun.sh) 1.4. Para subir em modo de desenvolvimento:
 
 ```bash
-cd frontend
-bun install
-bun run dev
+just instalar
+just front
 ```
 
-Também funciona com npm: `npm install` e `npm run dev` (os demais comandos abaixo valem com `npm run` no lugar de `bun run`).
+Sem o Bun, `npm install` e `npm run dev` dentro de `frontend/` também funcionam.
 
 A loja abre em `http://localhost:3000`.
 
 As chamadas a `/loja/**` são repassadas pelo próprio servidor do front para a API em `http://localhost:8080`; para apontar para outro endereço, defina a variável `NUXT_API_BASE`.
 
-Outros comandos úteis: `bun run lint` confere o padrão do código, `bun run test` roda os testes e `bun run build` gera a versão de produção em `.output/`.
+Outros comandos úteis: `just verificar-front` roda o lint (padrão e formatação), a checagem de tipos, os testes e o build de produção em `frontend/.output/`; `just formatar-front` corrige o que o lint consegue.
+
+## Padrões do projeto
+
+O CI (`.github/workflows/ci.yml`) roda em todo push e PR para `develop`, `main` e `release/**`. Antes de abrir um PR, `just verificar` roda localmente as mesmas checagens.
+
+- **Camadas:** em cada módulo, `dominio` e `aplicacao` são Java puro e não conhecem os adaptadores; o `adaptador.api` fala só com o service, nunca com o repositório. Um módulo só usa o que outro expõe. Quem garante isso são o ArchUnit e o Spring Modulith, no `ArquiteturaTests`.
+- **Cobertura:** cada pacote de `dominio` e `aplicacao` precisa de 80% de linhas e de ramos cobertos (JaCoCo). O relatório fica em `backend/ecommerce/target/site/jacoco/index.html` e também é publicado pelo CI.
+- **Documentação dos módulos:** o `Documenter` do Modulith gera os diagramas C4/PlantUML e o canvas de cada módulo em `backend/ecommerce/target/spring-modulith-docs`, publicados pelo CI.
+- **Formatação:** Java no google-java-format (estilo AOSP, 4 espaços, imports sem `*`), conferido pelo Spotless; front no ESLint Stylistic; o resto segue o `.editorconfig`.
+- **Hook de pre-commit:** formata os arquivos do commit e barra o que não tem correção automática. O `just instalar` ativa o hook.
+- **Branches:** GitFlow com `main`, `develop`, `feature/<nº>-...`, `fix/<nº>-...` e `release/...`, sempre com o número da issue no nome, e nenhuma branch é apagada.
+- **Commits:** `gitmoji tipo(escopo): descrição (#nº)`, com escopo `backend` ou `frontend` quando a mudança é de um lado só. Exemplo: `:sparkles: feat(backend): saída de estoque (#8)`.
