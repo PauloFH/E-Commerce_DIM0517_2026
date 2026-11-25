@@ -46,10 +46,13 @@ class ProdutoOpenApiTests {
                 .andExpect(
                         jsonPath("$.components.schemas.Problema.properties.erros.items['$ref']")
                                 .value("#/components/schemas/ErroCampo"))
-                .andExpect(jsonPath("$.components.schemas.ErroCampo.properties.*", hasSize(2)))
-                .andExpect(jsonPath("$.components.schemas.ErroCampo.properties.mensagem").exists())
                 .andExpect(
-                        jsonPath("$.components.schemas.ErroCampo.properties.chave").doesNotExist())
+                        jsonPath("$.components.schemas.Problema.properties.codigoErro.type")
+                                .value("string"))
+                .andExpect(jsonPath("$.components.schemas.ErroCampo.properties.*", hasSize(3)))
+                .andExpect(jsonPath("$.components.schemas.ErroCampo.properties.campo").exists())
+                .andExpect(jsonPath("$.components.schemas.ErroCampo.properties.chave").exists())
+                .andExpect(jsonPath("$.components.schemas.ErroCampo.properties.mensagem").exists())
                 .andExpect(
                         jsonPath(
                                         "$.paths['/loja/produto/{codigo}/estoque'].get.responses['200'].content['application/json']")

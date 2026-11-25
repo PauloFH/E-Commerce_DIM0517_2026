@@ -98,10 +98,12 @@ class ProdutoApiTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("{\"quantidade\":" + valor + "}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("O corpo da requisição é inválido."));
+                .andExpect(jsonPath("$.detail").value("O corpo da requisição é inválido."))
+                .andExpect(jsonPath("$.codigoErro").value("requisicao.json.invalido"));
         saida(1, "{\"quantidade\":" + valor + "}")
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("O corpo da requisição é inválido."));
+                .andExpect(jsonPath("$.detail").value("O corpo da requisição é inválido."))
+                .andExpect(jsonPath("$.codigoErro").value("requisicao.json.invalido"));
     }
 
     @ParameterizedTest
@@ -170,10 +172,12 @@ class ProdutoApiTests {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(corpo))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Os dados da requisição são inválidos."));
+                .andExpect(jsonPath("$.detail").value("Os dados da requisição são inválidos."))
+                .andExpect(jsonPath("$.codigoErro").value("requisicao.dados.invalidos"));
         saida(1, corpo)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Os dados da requisição são inválidos."));
+                .andExpect(jsonPath("$.detail").value("Os dados da requisição são inválidos."))
+                .andExpect(jsonPath("$.codigoErro").value("requisicao.dados.invalidos"));
     }
 
     @Test
@@ -233,8 +237,9 @@ class ProdutoApiTests {
                 .andExpect(jsonPath("$.erros[0].campo").value("codigo"))
                 .andExpect(
                         jsonPath("$.erros[0].mensagem").value("The product code must be positive."))
-                .andExpect(jsonPath("$.erros[0].chave").doesNotExist())
-                .andExpect(jsonPath("$.erros[0].valor").doesNotExist());
+                .andExpect(jsonPath("$.erros[0].chave").value("produto.codigo.positivo"))
+                .andExpect(jsonPath("$.erros[0].valor").doesNotExist())
+                .andExpect(jsonPath("$.codigoErro").value("requisicao.dados.invalidos"));
         mvc.perform(
                         post("/loja/produto")
                                 .header("Accept-Language", "en")
@@ -242,7 +247,8 @@ class ProdutoApiTests {
                                 .content("{"))
                 .andExpect(jsonPath("$.detail").value("The request body is invalid."));
         mvc.perform(get("/loja/produto/abc/estoque").header("Accept-Language", "en"))
-                .andExpect(jsonPath("$.detail").value("The request parameter is invalid."));
+                .andExpect(jsonPath("$.detail").value("The request parameter is invalid."))
+                .andExpect(jsonPath("$.codigoErro").value("requisicao.parametro.invalido"));
     }
 
     @Test
@@ -279,10 +285,12 @@ class ProdutoApiTests {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.detail").value("Estoque insuficiente: há 15 unidades."))
+                .andExpect(jsonPath("$.codigoErro").value("produto.estoque.insuficiente"))
                 .andExpect(jsonPath("$.argumentos[0]").value(15));
         saida(codigo, "{\"quantidade\":16}", "en")
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Insufficient stock: 15 units available."));
+                .andExpect(jsonPath("$.detail").value("Insufficient stock: 15 units available."))
+                .andExpect(jsonPath("$.codigoErro").value("produto.estoque.insuficiente"));
         mvc.perform(get("/loja/produto/{codigo}/estoque", codigo))
                 .andExpect(jsonPath("$.estoque").value(15));
     }
@@ -294,15 +302,17 @@ class ProdutoApiTests {
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(
-                        jsonPath("$.detail")
-                                .value("Produto " + codigoAusente + " não encontrado."));
+                        jsonPath("$.detail").value("Produto " + codigoAusente + " não encontrado."))
+                .andExpect(jsonPath("$.codigoErro").value("produto.nao.encontrado"));
     }
 
     @Test
     void saidaComCodigoInvalidoRetorna400() throws Exception {
         saida(0, "{\"quantidade\":1}")
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Os dados da requisição são inválidos."));
+                .andExpect(jsonPath("$.detail").value("Os dados da requisição são inválidos."))
+                .andExpect(jsonPath("$.erros[0].chave").value("produto.codigo.positivo"))
+                .andExpect(jsonPath("$.codigoErro").value("requisicao.dados.invalidos"));
     }
 
     private ResultActions saida(int codigo, String corpo) throws Exception {

@@ -82,7 +82,7 @@ public class GlobalHttpExceptionHandler {
      *
      * @param exception violações encontradas pelo Validator
      * @param request requisição atual
-     * @return problema 400 com extensão erros ordenada por campo e mensagem
+     * @return problema 400 com extensão erros ordenada por campo e chave
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public ProblemDetail dadosInvalidos(
@@ -93,12 +93,14 @@ public class GlobalHttpExceptionHandler {
                                 Map.of(
                                         "campo",
                                         violacao.getPropertyPath().toString(),
+                                        "chave",
+                                        violacao.getMessageTemplate(),
                                         "mensagem",
                                         mensagem(violacao.getMessageTemplate())))
                         .sorted(
                                 Comparator.comparing(
                                                 (Map<String, String> erro) -> erro.get("campo"))
-                                        .thenComparing(erro -> erro.get("mensagem")))
+                                        .thenComparing(erro -> erro.get("chave")))
                         .toList();
         ProblemDetail problema =
                 problema(HttpStatus.BAD_REQUEST, "requisicao.dados.invalidos", request);
@@ -114,6 +116,7 @@ public class GlobalHttpExceptionHandler {
         problema.setTitle(mensagem("http." + status.value()));
         problema.setType(URI.create("about:blank"));
         problema.setInstance(URI.create(request.getRequestURI()));
+        problema.setProperty("codigoErro", chave);
         return problema;
     }
 
