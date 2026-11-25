@@ -167,15 +167,29 @@
       },
       "abas": "Stock operations",
       "repor": "Restock",
+      "baixa": "Write off",
       "quantidade": "Quantity",
       "quantidadeExemplo": "E.g. 10",
+      "motivo": "Reason",
+      "motivoAjuda": "For your own records only; it is not sent to the system.",
+      "motivos": {
+        "perda": "Loss",
+        "avaria": "Damage",
+        "ajuste": "Adjustment"
+      },
+      "confirmacao": "Write off {n} unit of product {codigo}? Stock goes from {antes} to {depois}. | Write off {n} units of product {codigo}? Stock goes from {antes} to {depois}.",
+      "motivoInformativo": "Reason: {motivo} (informational only)",
+      "confirmarBaixa": "Confirm write-off",
+      "cancelar": "Cancel",
       "sucesso": "Stock for product {codigo}: {antes} → {depois} units.",
+      "sucessoBaixa": "Write-off recorded: stock for product {codigo} went from {antes} to {n} unit. | Write-off recorded: stock for product {codigo} went from {antes} to {n} units.",
       "erros": {
         "codigoVazio": "Enter the product code.",
         "codigoInvalido": "Use a whole number greater than zero.",
         "naoEncontrado": "Product {codigo} not found.",
         "quantidadeInvalida": "Enter a whole quantity greater than zero.",
-        "quantidadeLimite": "Quantity above the stock limit."
+        "quantidadeLimite": "Quantity above the stock limit.",
+        "estoqueInsuficiente": "Insufficient stock: {n} unit available. | Insufficient stock: {n} units available."
       }
     }
   },

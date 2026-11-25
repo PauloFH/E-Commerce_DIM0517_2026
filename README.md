@@ -89,13 +89,14 @@ Os DTOs HTTP são convertidos em entradas da aplicação pelo MapStruct; não s�
 
 ## Contrato HTTP
 
-Código e preço devem ser positivos e a quantidade de reposição positiva. O cadastro recebe somente código e preço e sempre cria o produto com estoque zero. Todos os campos de cada requisição são obrigatórios. Valores monetários são expressos em reais; estoque e quantidade em unidades inteiras. Campos inteiros JSON não aceitam decimais, strings ou booleanos, mesmo strings numéricas como `"10"`; o `preco` também não aceita strings nem booleanos, como `"59.90"`.
+Código e preço devem ser positivos e a quantidade de entrada e de saída positiva. O cadastro recebe somente código e preço e sempre cria o produto com estoque zero. Todos os campos de cada requisição são obrigatórios. Valores monetários são expressos em reais; estoque e quantidade em unidades inteiras. Campos inteiros JSON não aceitam decimais, strings ou booleanos, mesmo strings numéricas como `"10"`; o `preco` também não aceita strings nem booleanos, como `"59.90"`.
 
 | Operação | Entrada | Sucesso | Erros |
 |---|---|---|---|
 | `POST /loja/produto` | `codigo`, `preco` | 201 com `codigo`, `preco`, `estoque: 0` | 400, 409 |
 | `GET /loja/produto/{codigo}/estoque` | Código na rota | 200 somente com `codigo`, `estoque` | 400, 404 |
 | `PUT /loja/produto/{codigo}/entrada` | `quantidade` | 200 com `codigo`, `estoque` atualizado | 400, 404 |
+| `PUT /loja/produto/{codigo}/saida` | `quantidade` | 200 com `codigo`, `estoque` atualizado | 400, 404 |
 
 ```bash
 curl -i http://localhost:8080/loja/produto \
@@ -107,9 +108,13 @@ curl http://localhost:8080/loja/produto/123/estoque
 curl -X PUT http://localhost:8080/loja/produto/123/entrada \
   -H 'Content-Type: application/json' \
   -d '{"quantidade":10}'
+
+curl -X PUT http://localhost:8080/loja/produto/123/saida \
+  -H 'Content-Type: application/json' \
+  -d '{"quantidade":10}'
 ```
 
-Reposição não é idempotente: repetir a chamada soma novamente. O limite de estoque é `2147483647`; ultrapassá-lo retorna 400 sem alteração. Código duplicado retorna 409 sem sobrescrever; código ausente retorna 404.
+Reposição não é idempotente: repetir a chamada soma novamente. O limite de estoque é `2147483647`; ultrapassá-lo retorna 400 sem alteração. A saída também não é idempotente: repetir a chamada subtrai novamente. Quantidade maior que o estoque retorna 400 (`produto.estoque.insuficiente`) sem alteração, então o estoque nunca fica negativo; levar o estoque a zero é permitido. Código duplicado retorna 409 sem sobrescrever; código ausente retorna 404.
 
 O `GlobalHttpExceptionHandler` centraliza os erros de todos os módulos. As exceções de domínio estendem `ExcecaoNegocio`, contrato público em Java puro de `compartilhado`, e o handler converte suas categorias em status HTTP sem acessar o interior de produto.
 
@@ -117,7 +122,7 @@ Erros usam `application/problem+json`, com `type: about:blank`, `title`, `status
 
 ## Armazenamento
 
-`ProdutoRepository` define consulta, inserção sem sobrescrita, soma atômica e baixa em lote. Na baixa, produto ausente ou estoque insuficiente retorna `false` sem alterar nenhum item; mapa vazio retorna `true`. A porta recebe produtos válidos, códigos positivos, quantidades positivas e nenhum valor nulo.
+`ProdutoRepository` define consulta, inserção sem sobrescrita, soma atômica e baixa em lote. A baixa retorna um `ResultadoBaixa`: `Baixado` com os produtos atualizados, `ProdutoInexistente` ou `EstoqueInsuficiente` (com o estoque disponível). Se algum código não existe, esse resultado prevalece sobre estoque insuficiente; em ambos nada é alterado. Mapa vazio retorna `Baixado` sem itens. A porta recebe produtos válidos, códigos positivos, quantidades positivas e nenhum valor nulo.
 
 O adaptador em memória usa um único monitor em todas as operações, inclusive leituras, impedindo observar uma baixa parcial. Atualizações substituem produtos imutáveis. Um futuro adaptador de banco deverá preservar os mesmos contratos e garantir atomicidade entre instâncias.
 

@@ -2,7 +2,7 @@ package br.ufrn.imd.ecommerce.produto.adaptador.api;
 
 import br.ufrn.imd.ecommerce.compartilhado.Problema;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.CadastrarProdutoRequest;
-import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.SomarEstoqueRequest;
+import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.MovimentoEstoqueRequest;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.EstoqueDto;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.ProdutoDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -174,10 +174,69 @@ public interface ProdutoApi {
                                             schema =
                                                     @Schema(
                                                             implementation =
-                                                                    SomarEstoqueRequest.class,
+                                                                    MovimentoEstoqueRequest.class,
                                                             requiredProperties = {"quantidade"}),
                                             examples =
                                                     @ExampleObject(value = "{\"quantidade\":10}")))
                     @RequestBody
-                    SomarEstoqueRequest request);
+                    MovimentoEstoqueRequest request);
+
+    /**
+     * Retira unidades do estoque; repetir a requisição retira novamente.
+     *
+     * @param codigo identificador inteiro positivo
+     * @param request quantidade inteira positiva obrigatória
+     * @return 200 com código e novo estoque; 400 se inválido ou maior que o estoque; 404 se ausente
+     */
+    @Operation(
+            summary = "Retirar estoque",
+            description =
+                    "Quantidade inteira positiva obrigatória. Operação não idempotente: cada chamada subtrai novamente. A quantidade não pode ser maior que o estoque disponível.")
+    @ApiResponse(
+            responseCode = "200",
+            description = "Estoque atualizado",
+            content =
+                    @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = EstoqueDto.class),
+                            examples = @ExampleObject(value = "{\"codigo\":123,\"estoque\":5}")))
+    @ApiResponse(
+            responseCode = "400",
+            description = "Entrada inválida ou estoque insuficiente",
+            content =
+                    @Content(
+                            mediaType = "application/problem+json",
+                            schema = @Schema(implementation = Problema.class)))
+    @ApiResponse(
+            responseCode = "404",
+            description = "Produto não encontrado",
+            content =
+                    @Content(
+                            mediaType = "application/problem+json",
+                            schema = @Schema(implementation = Problema.class)))
+    @PutMapping(
+            value = "/{codigo}/saida",
+            consumes = "application/json",
+            produces = "application/json")
+    ResponseEntity<EstoqueDto> saida(
+            @Parameter(
+                            description = "Identificador inteiro positivo",
+                            example = "1",
+                            schema = @Schema(type = "integer", format = "int32", minimum = "1"))
+                    @PathVariable("codigo")
+                    Integer codigo,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                            required = true,
+                            content =
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    MovimentoEstoqueRequest.class,
+                                                            requiredProperties = {"quantidade"}),
+                                            examples =
+                                                    @ExampleObject(value = "{\"quantidade\":10}")))
+                    @RequestBody
+                    MovimentoEstoqueRequest request);
 }

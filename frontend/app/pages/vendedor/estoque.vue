@@ -6,7 +6,7 @@ definePageMeta({ layout: 'vendedor' })
 
 const { t, locale } = useI18n()
 const route = useRoute()
-const { consultarEstoque, darEntrada } = useLoja()
+const { consultarEstoque, darEntrada, darSaida } = useLoja()
 const { produtos, registrar } = useProdutosConhecidos()
 
 useHead({ title: () => `${t('paginas.estoque.titulo')} · kompraki` })
@@ -18,11 +18,33 @@ const ocupado = ref(false)
 const erroCodigo = ref<ErroCampo>()
 const erroQuantidade = ref<ErroCampo>()
 const falha = ref<'erros.rede' | 'erros.generico'>()
-const sucesso = ref<{ codigo: number, antes: number, depois: number }>()
+const sucesso = ref<{ chave: string, codigo: number, antes: number, depois: number }>()
+const quantidadeBaixa = ref('')
+// o motivo é só anotação da tela: nunca vai para a API
+const MOTIVOS = ['perda', 'avaria', 'ajuste'] as const
+const motivo = ref<typeof MOTIVOS[number]>('perda')
+const pendente = ref<{ codigo: number, quantidade: number, antes: number, depois: number }>()
 
-// para a #8 basta acrescentar "Dar baixa" aqui e um painel com o mesmo id
-const abas = computed(() => [{ id: 'repor', rotulo: t('paginas.estoque.repor') }])
-const abaAtiva = ref('repor')
+const abas = computed(() => [
+  { id: 'repor', rotulo: t('paginas.estoque.repor') },
+  { id: 'baixa', rotulo: t('paginas.estoque.baixa') },
+])
+const abaAtiva = ref(abas.value.find(a => a.id === route.query.aba)?.id ?? 'repor')
+
+function trocarAba(id: string) {
+  abaAtiva.value = id
+  limparMensagens()
+  navigateTo({ query: { ...route.query, aba: id } }, { replace: true })
+}
+
+function teclaAba(evento: KeyboardEvent) {
+  const ids = abas.value.map(a => a.id)
+  const destino = indiceDaTecla(evento.key, ids.indexOf(abaAtiva.value), ids.length)
+  if (destino === undefined) return
+  evento.preventDefault()
+  trocarAba(ids[destino]!)
+  nextTick(() => document.getElementById(`aba-${ids[destino]}`)?.focus())
+}
 
 // o preço só existe no que este navegador já viu; a API de estoque não devolve
 const preco = computed(() => produtos.value.find(p => p.codigo === produto.value?.codigo)?.preco)
@@ -36,13 +58,14 @@ const rotuloSelo = computed(() => {
 const textoErro = (erro?: ErroCampo) => (erro ? t(erro.chave, erro.params ?? {}) : undefined)
 
 watch(codigo, () => (erroCodigo.value = undefined))
-watch(quantidade, () => (erroQuantidade.value = undefined))
+watch([quantidade, quantidadeBaixa], () => (erroQuantidade.value = undefined))
 
 function limparMensagens() {
   erroCodigo.value = undefined
   erroQuantidade.value = undefined
   falha.value = undefined
   sucesso.value = undefined
+  pendente.value = undefined
 }
 
 function tratarFalha(erro: unknown, numero: number) {
@@ -72,7 +95,7 @@ async function consultar() {
   const consulta = ++ultimaConsulta
   ocupado.value = true
   try {
-    await navigateTo({ query: { codigo: String(numero) } }, { replace: true })
+    await navigateTo({ query: { ...route.query, codigo: String(numero) } }, { replace: true })
     const { estoque } = await consultarEstoque(numero)
     if (consulta !== ultimaConsulta) return
     produto.value = { codigo: numero, estoque }
@@ -100,7 +123,7 @@ async function repor() {
     const { estoque: depois } = await darEntrada(numero, resultado.valor)
     produto.value = { codigo: numero, estoque: depois }
     registrar({ codigo: numero, estoque: depois })
-    sucesso.value = { codigo: numero, antes, depois }
+    sucesso.value = { chave: 'paginas.estoque.sucesso', codigo: numero, antes, depois }
     quantidade.value = ''
   }
   catch (erro) {
@@ -116,6 +139,67 @@ async function repor() {
   finally {
     ocupado.value = false
   }
+}
+
+const estoqueInsuficiente = (n: number): ErroCampo => ({ chave: 'paginas.estoque.erros.estoqueInsuficiente', params: { n } })
+
+function pedirBaixa() {
+  if (!produto.value) return
+  limparMensagens()
+  const resultado = validarQuantidade(quantidadeBaixa.value)
+  if ('erro' in resultado) {
+    erroQuantidade.value = resultado.erro
+    return
+  }
+  const { codigo: numero, estoque: antes } = produto.value
+  if (resultado.valor > antes) {
+    erroQuantidade.value = estoqueInsuficiente(antes)
+    return
+  }
+  pendente.value = { codigo: numero, quantidade: resultado.valor, antes, depois: antes - resultado.valor }
+}
+
+async function confirmarBaixa() {
+  const baixa = pendente.value
+  if (!baixa) return
+  limparMensagens()
+  ocupado.value = true
+  try {
+    const { estoque: depois } = await darSaida(baixa.codigo, baixa.quantidade)
+    produto.value = { codigo: baixa.codigo, estoque: depois }
+    registrar({ codigo: baixa.codigo, estoque: depois })
+    sucesso.value = { chave: 'paginas.estoque.sucessoBaixa', codigo: baixa.codigo, antes: baixa.antes, depois }
+    quantidadeBaixa.value = ''
+    motivo.value = 'perda'
+  }
+  catch (erro) {
+    if ((erro as ProblemDetail).status !== 400) {
+      tratarFalha(erro, baixa.codigo)
+    }
+    else {
+      // o detail do 400 ainda é chave crua (#4); com a quantidade válida aqui, só pode ser estoque que mudou
+      try {
+        const { estoque } = await consultarEstoque(baixa.codigo)
+        produto.value = { codigo: baixa.codigo, estoque }
+        registrar({ codigo: baixa.codigo, estoque })
+        erroQuantidade.value = estoqueInsuficiente(estoque)
+      }
+      catch (falhaConsulta) {
+        tratarFalha(falhaConsulta, baixa.codigo)
+      }
+    }
+  }
+  finally {
+    ocupado.value = false
+  }
+}
+
+function teclaMotivo(evento: KeyboardEvent) {
+  const destino = indiceDaTecla(evento.key, MOTIVOS.indexOf(motivo.value), MOTIVOS.length)
+  if (destino === undefined || evento.key === 'Home' || evento.key === 'End') return
+  evento.preventDefault()
+  motivo.value = MOTIVOS[destino]!
+  nextTick(() => document.getElementById(`motivo-${motivo.value}`)?.focus())
 }
 
 onMounted(() => {
@@ -147,7 +231,7 @@ onMounted(() => {
         v-if="sucesso"
         tipo="sucesso"
       >
-        {{ t('paginas.estoque.sucesso', sucesso) }}
+        {{ t(sucesso.chave, { ...sucesso, n: sucesso.depois }) }}
       </KAlert>
       <KAlert
         v-if="falha"
@@ -221,6 +305,7 @@ onMounted(() => {
             class="abas"
             role="tablist"
             :aria-label="t('paginas.estoque.abas')"
+            @keydown="teclaAba"
           >
             <button
               v-for="aba in abas"
@@ -231,7 +316,8 @@ onMounted(() => {
               class="aba label"
               :aria-selected="abaAtiva === aba.id"
               :aria-controls="`painel-${aba.id}`"
-              @click="abaAtiva = aba.id"
+              :tabindex="abaAtiva === aba.id ? 0 : -1"
+              @click="trocarAba(aba.id)"
             >
               {{ aba.rotulo }}
             </button>
@@ -263,6 +349,97 @@ onMounted(() => {
                 :disabled="ocupado"
               >
                 {{ t('paginas.estoque.repor') }}
+              </KButton>
+            </form>
+          </div>
+
+          <div
+            v-else
+            id="painel-baixa"
+            role="tabpanel"
+            aria-labelledby="aba-baixa"
+          >
+            <div
+              v-if="pendente"
+              class="conteudo-aba pilha"
+            >
+              <KAlert tipo="atencao">
+                {{ t('paginas.estoque.confirmacao', { ...pendente, n: pendente.quantidade }) }}
+              </KAlert>
+              <p class="caption">
+                {{ t('paginas.estoque.motivoInformativo', { motivo: t(`paginas.estoque.motivos.${motivo}`) }) }}
+              </p>
+              <div class="botoes">
+                <KButton
+                  :disabled="ocupado"
+                  @click="confirmarBaixa"
+                >
+                  {{ t('paginas.estoque.confirmarBaixa') }}
+                </KButton>
+                <KButton
+                  variante="secundario"
+                  :disabled="ocupado"
+                  @click="pendente = undefined"
+                >
+                  {{ t('paginas.estoque.cancelar') }}
+                </KButton>
+              </div>
+            </div>
+
+            <form
+              v-else
+              class="conteudo-aba pilha"
+              novalidate
+              @submit.prevent="pedirBaixa"
+            >
+              <div class="campo-quantidade">
+                <KInput
+                  v-model="quantidadeBaixa"
+                  :label="t('paginas.estoque.quantidade')"
+                  :erro="textoErro(erroQuantidade)"
+                  :placeholder="t('paginas.estoque.quantidadeExemplo')"
+                  inputmode="numeric"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="grupo-motivo">
+                <span
+                  id="rotulo-motivo"
+                  class="label"
+                >{{ t('paginas.estoque.motivo') }}</span>
+                <div
+                  class="motivos"
+                  role="radiogroup"
+                  aria-labelledby="rotulo-motivo"
+                  aria-describedby="ajuda-motivo"
+                  @keydown="teclaMotivo"
+                >
+                  <button
+                    v-for="opcao in MOTIVOS"
+                    :id="`motivo-${opcao}`"
+                    :key="opcao"
+                    type="button"
+                    role="radio"
+                    class="chip label"
+                    :aria-checked="motivo === opcao"
+                    :tabindex="motivo === opcao ? 0 : -1"
+                    @click="motivo = opcao"
+                  >
+                    {{ t(`paginas.estoque.motivos.${opcao}`) }}
+                  </button>
+                </div>
+                <p
+                  id="ajuda-motivo"
+                  class="caption ajuda"
+                >
+                  {{ t('paginas.estoque.motivoAjuda') }}
+                </p>
+              </div>
+              <KButton
+                type="submit"
+                :disabled="ocupado"
+              >
+                {{ t('paginas.estoque.baixa') }}
               </KButton>
             </form>
           </div>
@@ -337,9 +514,36 @@ onMounted(() => {
 
 .conteudo-aba { padding: var(--spacing-6); }
 
+.pilha { display: flex; flex-direction: column; align-items: flex-start; gap: var(--spacing-6); }
+
+.campo-quantidade { width: 240px; max-width: 100%; }
+
+.grupo-motivo { display: flex; flex-direction: column; gap: var(--spacing-2); }
+.motivos { display: flex; flex-wrap: wrap; gap: var(--spacing-3); }
+.ajuda { margin: 0; color: var(--color-text-secondary); }
+
+.chip {
+  height: 40px;
+  padding: 0 var(--spacing-4);
+  border: 1.5px solid var(--color-border-field);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-surface);
+}
+
+.chip[aria-checked='true'] {
+  border: 2px solid var(--color-border-brand);
+  background: var(--color-bg-info);
+  color: var(--color-text-brand);
+}
+
+.botoes { display: flex; flex-wrap: wrap; gap: var(--spacing-3); }
+
 @media (max-width: 640px) {
   .linha { flex-direction: column; align-items: stretch; }
   .acao { margin-top: 0; }
+  .pilha { align-items: stretch; }
+  .campo-quantidade { width: auto; }
+  .botoes { flex-direction: column; }
   .resumo { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
