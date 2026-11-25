@@ -14,10 +14,19 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -91,6 +100,97 @@ class ProdutoServiceTests {
                 .isEqualTo(Integer.MAX_VALUE);
     }
 
+    @Test
+    void saidaSubtraiDoEstoque() {
+        service.cadastrar(new CadastrarProdutoDto(1, BigDecimal.ONE));
+        service.entrada(new MovimentoEstoqueDto(1, 15));
+        assertThat(service.saida(new MovimentoEstoqueDto(1, 10))).isEqualTo(5);
+        assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque()).isEqualTo(5);
+    }
+
+    @Test
+    void saidaIgualAoEstoqueZera() {
+        service.cadastrar(new CadastrarProdutoDto(1, BigDecimal.ONE));
+        service.entrada(new MovimentoEstoqueDto(1, 15));
+        assertThat(service.saida(new MovimentoEstoqueDto(1, 15))).isZero();
+        assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque()).isZero();
+    }
+
+    @Test
+    void saidaMaiorQueOEstoqueFalhaSemAlterar() {
+        service.cadastrar(new CadastrarProdutoDto(1, BigDecimal.ONE));
+        service.entrada(new MovimentoEstoqueDto(1, 15));
+        assertThatThrownBy(() -> service.saida(new MovimentoEstoqueDto(1, 16)))
+                .isInstanceOf(DadosInvalidosException.class)
+                .hasMessage("produto.estoque.insuficiente")
+                .satisfies(e ->
+                        assertThat(((DadosInvalidosException) e).getArgumentos())
+                                .containsExactly(15));
+        assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque()).isEqualTo(15);
+    }
+
+    @Test
+    void saidaDeProdutoInexistenteFalha() {
+        assertThatThrownBy(() -> service.saida(new MovimentoEstoqueDto(1, 1)))
+                .isInstanceOf(ProdutoNaoEncontradoException.class)
+                .hasMessage("produto.nao.encontrado");
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(ints = {0, -1})
+    void saidaComQuantidadeInvalidaNaoAlteraNada(Integer quantidade) {
+        service.cadastrar(new CadastrarProdutoDto(1, BigDecimal.ONE));
+        service.entrada(new MovimentoEstoqueDto(1, 15));
+        assertThatThrownBy(() -> service.saida(new MovimentoEstoqueDto(1, quantidade)))
+                .isInstanceOf(ConstraintViolationException.class);
+        assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque()).isEqualTo(15);
+    }
+
+    @Test
+    @Timeout(15)
+    void saidasConcorrentesNuncaDeixamEstoqueNegativo() throws Exception {
+        int inicial = 1000;
+        int quantidade = 3;
+        int threads = 16;
+        service.cadastrar(new CadastrarProdutoDto(1, BigDecimal.ONE));
+        service.entrada(new MovimentoEstoqueDto(1, inicial));
+        var largada = new CountDownLatch(1);
+        var sucessos = new AtomicInteger();
+        var estoqueNegativo = new AtomicBoolean();
+        List<Callable<Void>> tarefas = new ArrayList<>();
+
+        for (int i = 0; i < threads; i++) {
+            tarefas.add(() -> {
+                largada.await();
+                for (int j = 0; j < 100; j++) {
+                    try {
+                        if (service.saida(new MovimentoEstoqueDto(1, quantidade)) < 0) {
+                            estoqueNegativo.set(true);
+                        }
+                        sucessos.incrementAndGet();
+                    } catch (DadosInvalidosException esperada) {
+                        // estoque esgotado: a saída é recusada
+                    }
+                }
+                return null;
+            });
+        }
+
+        try (var executor = Executors.newFixedThreadPool(threads)) {
+            var resultados = tarefas.stream().map(executor::submit).toList();
+            largada.countDown();
+            for (var resultado : resultados) {
+                resultado.get(10, TimeUnit.SECONDS);
+            }
+        }
+
+        int estoqueFinal = service.consultar(new BuscarProdutoDto(1)).getEstoque();
+        assertThat(estoqueNegativo).isFalse();
+        assertThat(estoqueFinal).isGreaterThanOrEqualTo(0);
+        assertThat(sucessos.get() * quantidade + estoqueFinal).isEqualTo(inicial);
+    }
+
     @ParameterizedTest
     @NullSource
     @ValueSource(ints = {0, -1})
@@ -100,6 +200,8 @@ class ProdutoServiceTests {
         assertThatThrownBy(() -> service.cadastrar(new CadastrarProdutoDto(codigo, BigDecimal.ONE)))
                 .isInstanceOf(ConstraintViolationException.class);
         assertThatThrownBy(() -> service.entrada(new MovimentoEstoqueDto(codigo, 1)))
+                .isInstanceOf(ConstraintViolationException.class);
+        assertThatThrownBy(() -> service.saida(new MovimentoEstoqueDto(codigo, 1)))
                 .isInstanceOf(ConstraintViolationException.class);
     }
 
@@ -133,5 +235,6 @@ class ProdutoServiceTests {
         assertThatThrownBy(() -> service.cadastrar(null))
                 .isInstanceOf(DadosInvalidosException.class);
         assertThatThrownBy(() -> service.entrada(null)).isInstanceOf(DadosInvalidosException.class);
+        assertThatThrownBy(() -> service.saida(null)).isInstanceOf(DadosInvalidosException.class);
     }
 }

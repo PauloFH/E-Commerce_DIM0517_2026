@@ -4,6 +4,7 @@ import br.ufrn.imd.ecommerce.produto.aplicacao.dto.BuscarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.CadastrarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.MovimentoEstoqueDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.porta.ProdutoRepository;
+import br.ufrn.imd.ecommerce.produto.aplicacao.porta.ResultadoBaixa;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.DadosInvalidosException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoJaExisteException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoNaoEncontradoException;
@@ -11,6 +12,7 @@ import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import java.util.Map;
 import java.util.Objects;
 
 /** Casos de uso de produto, independentes de Spring e do armazenamento concreto. */
@@ -108,6 +110,30 @@ public final class ProdutoService {
         }
 
         return estoque;
+    }
+
+    /**
+     * Baixa estoque atomicamente; o estoque nunca fica negativo.
+     *
+     * @param dados código e quantidade em unidades
+     * @return estoque após a saída
+     * @throws ConstraintViolationException se algum campo for inválido
+     * @throws ProdutoNaoEncontradoException se o produto não existir
+     * @throws DadosInvalidosException se a entrada for nula ou a quantidade exceder o estoque
+     */
+    public Integer saida(MovimentoEstoqueDto dados) {
+        validar(dados);
+
+        return switch (repository.baixarEstoque(Map.of(dados.codigo(), dados.quantidade()))) {
+            case ResultadoBaixa.Baixado baixado ->
+                    baixado.produtos().get(dados.codigo()).getEstoque();
+            case ResultadoBaixa.ProdutoInexistente inexistente ->
+                    throw new ProdutoNaoEncontradoException(
+                            "produto.nao.encontrado", inexistente.codigo());
+            case ResultadoBaixa.EstoqueInsuficiente insuficiente ->
+                    throw new DadosInvalidosException(
+                            "produto.estoque.insuficiente", insuficiente.disponivel());
+        };
     }
 
     /** Executa as restrições declarativas antes de qualquer efeito no armazenamento. */
