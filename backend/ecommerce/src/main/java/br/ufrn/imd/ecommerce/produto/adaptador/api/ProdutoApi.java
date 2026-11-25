@@ -7,6 +7,7 @@ import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.EstoqueDto;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.ProdutoDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,6 +36,12 @@ public interface ProdutoApi {
             summary = "Cadastrar produto",
             description =
                     "Código inteiro positivo e preço positivo em reais, ambos obrigatórios. O estoque inicial é sempre zero.")
+    @Parameter(
+            name = "Accept-Language",
+            in = ParameterIn.HEADER,
+            description = "Idioma das mensagens de erro: pt-BR ou en; padrão pt-BR.",
+            schema = @Schema(type = "string"),
+            example = "en")
     @ApiResponse(
             responseCode = "201",
             description = "Produto criado com estoque zero",
@@ -90,6 +97,12 @@ public interface ProdutoApi {
     @Operation(
             summary = "Consultar estoque",
             description = "Retorna somente código e estoque em unidades inteiras, sem preço.")
+    @Parameter(
+            name = "Accept-Language",
+            in = ParameterIn.HEADER,
+            description = "Idioma das mensagens de erro: pt-BR ou en; padrão pt-BR.",
+            schema = @Schema(type = "string"),
+            example = "en")
     @ApiResponse(
             responseCode = "200",
             description = "Estoque encontrado",
@@ -133,6 +146,12 @@ public interface ProdutoApi {
             summary = "Repor estoque",
             description =
                     "Quantidade inteira positiva obrigatória. Operação não idempotente: cada chamada soma novamente. Estoque limitado a 2147483647 unidades.")
+    @Parameter(
+            name = "Accept-Language",
+            in = ParameterIn.HEADER,
+            description = "Idioma das mensagens de erro: pt-BR ou en; padrão pt-BR.",
+            schema = @Schema(type = "string"),
+            example = "en")
     @ApiResponse(
             responseCode = "200",
             description = "Estoque atualizado",

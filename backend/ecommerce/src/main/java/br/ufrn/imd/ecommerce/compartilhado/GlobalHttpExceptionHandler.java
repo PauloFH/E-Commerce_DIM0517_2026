@@ -5,6 +5,9 @@ import jakarta.validation.ConstraintViolationException;
 import java.net.URI;
 import java.util.Comparator;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -15,6 +18,16 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 /** Tratamento central de erros de negócio, transporte e validação declarativa. */
 @RestControllerAdvice
 public class GlobalHttpExceptionHandler {
+
+    private final MessageSource mensagens;
+
+    /**
+     * @param mensagens catálogo de mensagens da API
+     */
+    public GlobalHttpExceptionHandler(@Qualifier("messageSource") MessageSource mensagens) {
+        this.mensagens = mensagens;
+    }
+
     /**
      * Traduz a categoria de negócio sem depender de classes internas dos módulos.
      *
@@ -30,7 +43,14 @@ public class GlobalHttpExceptionHandler {
                     case NAO_ENCONTRADO -> HttpStatus.NOT_FOUND;
                     case CONFLITO -> HttpStatus.CONFLICT;
                 };
-        ProblemDetail problema = problema(status, exception.getChave(), request);
+
+        ProblemDetail problema =
+                problema(
+                        status,
+                        exception.getChave(),
+                        request,
+                        exception.getArgumentos().stream().map(String::valueOf).toArray());
+
         problema.setProperty("argumentos", exception.getArgumentos());
         return problema;
     }
@@ -58,11 +78,11 @@ public class GlobalHttpExceptionHandler {
     }
 
     /**
-     * Apresenta campos e chaves de validação, sem publicar os valores rejeitados.
+     * Apresenta campos e mensagens de validação, sem publicar os valores rejeitados.
      *
      * @param exception violações encontradas pelo Validator
      * @param request requisição atual
-     * @return problema 400 com extensão erros ordenada por campo e chave
+     * @return problema 400 com extensão erros ordenada por campo e mensagem
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public ProblemDetail dadosInvalidos(
@@ -73,12 +93,12 @@ public class GlobalHttpExceptionHandler {
                                 Map.of(
                                         "campo",
                                         violacao.getPropertyPath().toString(),
-                                        "chave",
-                                        violacao.getMessage()))
+                                        "mensagem",
+                                        mensagem(violacao.getMessageTemplate())))
                         .sorted(
                                 Comparator.comparing(
                                                 (Map<String, String> erro) -> erro.get("campo"))
-                                        .thenComparing(erro -> erro.get("chave")))
+                                        .thenComparing(erro -> erro.get("mensagem")))
                         .toList();
         ProblemDetail problema =
                 problema(HttpStatus.BAD_REQUEST, "requisicao.dados.invalidos", request);
@@ -87,10 +107,17 @@ public class GlobalHttpExceptionHandler {
     }
 
     /** Monta os campos padrão sem depender das classes internas dos módulos. */
-    private ProblemDetail problema(HttpStatus status, String chave, HttpServletRequest request) {
-        ProblemDetail problema = ProblemDetail.forStatusAndDetail(status, chave);
+    private ProblemDetail problema(
+            HttpStatus status, String chave, HttpServletRequest request, Object... argumentos) {
+        ProblemDetail problema =
+                ProblemDetail.forStatusAndDetail(status, mensagem(chave, argumentos));
+        problema.setTitle(mensagem("http." + status.value()));
         problema.setType(URI.create("about:blank"));
         problema.setInstance(URI.create(request.getRequestURI()));
         return problema;
+    }
+
+    private String mensagem(String chave, Object... argumentos) {
+        return mensagens.getMessage(chave, argumentos, LocaleContextHolder.getLocale());
     }
 }
