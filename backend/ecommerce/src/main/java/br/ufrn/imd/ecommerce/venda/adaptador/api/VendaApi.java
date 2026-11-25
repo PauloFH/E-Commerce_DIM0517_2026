@@ -4,6 +4,8 @@ import br.ufrn.imd.ecommerce.compartilhado.Problema;
 import br.ufrn.imd.ecommerce.venda.adaptador.api.dto.requisicao.VendaRequest;
 import br.ufrn.imd.ecommerce.venda.adaptador.api.dto.resposta.VendaResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,6 +31,12 @@ public interface VendaApi {
             summary = "Registrar venda",
             description =
                     "Recebe um ou mais itens com código e quantidade positivos, baixa o estoque de cada produto e calcula o total. A venda é atômica: se algum item for inválido, inexistente ou sem estoque, nenhum estoque muda. Itens com o mesmo código têm as quantidades somadas e aparecem uma única vez na resposta. Operação não idempotente: cada chamada bem-sucedida baixa o estoque novamente.")
+    @Parameter(
+            name = "Accept-Language",
+            in = ParameterIn.HEADER,
+            description = "Idioma das mensagens de erro: pt-BR ou en; padrão pt-BR.",
+            schema = @Schema(type = "string"),
+            example = "en")
     @ApiResponse(
             responseCode = "201",
             description = "Venda registrada",
