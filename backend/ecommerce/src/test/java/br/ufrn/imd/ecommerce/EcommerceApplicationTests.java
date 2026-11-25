@@ -3,6 +3,7 @@ package br.ufrn.imd.ecommerce;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import br.ufrn.imd.ecommerce.produto.adaptador.api.mapper.ProdutoMapper;
+import br.ufrn.imd.ecommerce.produto.adaptador.memoria.ProdutoRepositoryEmMemoria;
 import br.ufrn.imd.ecommerce.produto.aplicacao.porta.ProdutoRepository;
 import br.ufrn.imd.ecommerce.produto.aplicacao.servico.ProdutoService;
 import jakarta.validation.Validator;
@@ -19,7 +20,7 @@ class EcommerceApplicationTests {
 
     @Test
     void contextLoads() {
-        assertThat(repository).isNotNull();
+        assertThat(repository).isInstanceOf(ProdutoRepositoryEmMemoria.class);
         assertThat(service).isNotNull();
         assertThat(mapper).isNotNull();
         assertThat(validator).isNotNull();
