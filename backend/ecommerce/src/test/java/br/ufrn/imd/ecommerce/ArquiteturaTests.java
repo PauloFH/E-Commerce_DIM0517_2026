@@ -1,5 +1,6 @@
 package br.ufrn.imd.ecommerce;
 
+import br.ufrn.imd.ecommerce.compartilhado.ExcecaoNegocio;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
@@ -12,6 +13,8 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.modulith.core.ApplicationModules;
 
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.type;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,8 +31,14 @@ class ArquiteturaTests {
     void dominioEAplicacaoNaoDependemDosAdaptadores() {
         var classes = new ClassFileImporter().withImportOption(new ImportOption.DoNotIncludeTests())
                 .importPackages("br.ufrn.imd.ecommerce");
+        var contratoNegocio = type(ExcecaoNegocio.class)
+                .or(type(ExcecaoNegocio.Tipo.class)).or(type(ExcecaoNegocio.Tipo[].class));
         classes().that().resideInAPackage("..produto.dominio..")
-                .should().onlyDependOnClassesThat().resideInAnyPackage("java..", "..produto.dominio..")
+                .should().onlyDependOnClassesThat(
+                        resideInAnyPackage("java..", "..produto.dominio..").or(contratoNegocio))
+                .check(classes);
+        classes().that(contratoNegocio)
+                .should().onlyDependOnClassesThat(resideInAnyPackage("java..").or(contratoNegocio))
                 .check(classes);
         classes().that().resideInAPackage("..produto.aplicacao..")
                 .should().onlyDependOnClassesThat().resideInAnyPackage(
