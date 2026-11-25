@@ -1,11 +1,11 @@
 package br.ufrn.imd.ecommerce.produto.adaptador.api.mapper;
 
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.CadastrarProdutoRequest;
-import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.SomarEstoqueRequest;
+import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.MovimentoEstoqueRequest;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.EstoqueDto;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.ProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.CadastrarProdutoDto;
-import br.ufrn.imd.ecommerce.produto.aplicacao.dto.SomarEstoqueDto;
+import br.ufrn.imd.ecommerce.produto.aplicacao.dto.MovimentoEstoqueDto;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -25,10 +25,10 @@ public interface ProdutoMapper {
      * Combina código da rota e quantidade do corpo.
      *
      * @param codigo identificador da rota
-     * @param request corpo da reposição
+     * @param request corpo da movimentação
      * @return entrada do caso de uso
      */
-    SomarEstoqueDto paraReposicao(Integer codigo, SomarEstoqueRequest request);
+    MovimentoEstoqueDto paraMovimento(Integer codigo, MovimentoEstoqueRequest request);
 
     /**
      * Converte o produto em representação de transporte.

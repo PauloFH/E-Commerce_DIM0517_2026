@@ -2,7 +2,7 @@ package br.ufrn.imd.ecommerce.produto.aplicacao.servico;
 
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.BuscarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.CadastrarProdutoDto;
-import br.ufrn.imd.ecommerce.produto.aplicacao.dto.SomarEstoqueDto;
+import br.ufrn.imd.ecommerce.produto.aplicacao.dto.MovimentoEstoqueDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.porta.ProdutoRepository;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.DadosInvalidosException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoJaExisteException;
@@ -92,7 +92,7 @@ public final class ProdutoService {
      * @throws ProdutoNaoEncontradoException se o produto não existir
      * @throws DadosInvalidosException se a entrada for nula ou o estoque exceder o limite inteiro
      */
-    public Integer entrada(SomarEstoqueDto dados) {
+    public Integer entrada(MovimentoEstoqueDto dados) {
         validar(dados);
         Integer estoque;
 

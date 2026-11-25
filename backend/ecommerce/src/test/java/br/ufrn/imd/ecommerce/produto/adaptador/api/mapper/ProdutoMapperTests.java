@@ -3,7 +3,7 @@ package br.ufrn.imd.ecommerce.produto.adaptador.api.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.CadastrarProdutoRequest;
-import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.SomarEstoqueRequest;
+import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.MovimentoEstoqueRequest;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.EstoqueDto;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.ProdutoDto;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
@@ -19,7 +19,7 @@ class ProdutoMapperTests {
         var entrada = mapper.paraCadastro(new CadastrarProdutoRequest(1, new BigDecimal("10.50")));
         assertThat(entrada.codigo()).isEqualTo(1);
         assertThat(entrada.preco()).isEqualByComparingTo("10.50");
-        var reposicao = mapper.paraReposicao(1, new SomarEstoqueRequest(3));
+        var reposicao = mapper.paraMovimento(1, new MovimentoEstoqueRequest(3));
         assertThat(reposicao.codigo()).isEqualTo(1);
         assertThat(reposicao.quantidade()).isEqualTo(3);
         var resposta = mapper.paraResposta(new Produto(1, entrada.preco(), 8));

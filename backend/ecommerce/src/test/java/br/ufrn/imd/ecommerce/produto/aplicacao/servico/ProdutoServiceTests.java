@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import br.ufrn.imd.ecommerce.produto.adaptador.memoria.ProdutoRepositoryEmMemoria;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.BuscarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.CadastrarProdutoDto;
-import br.ufrn.imd.ecommerce.produto.aplicacao.dto.SomarEstoqueDto;
+import br.ufrn.imd.ecommerce.produto.aplicacao.dto.MovimentoEstoqueDto;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.DadosInvalidosException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoJaExisteException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoNaoEncontradoException;
@@ -46,8 +46,8 @@ class ProdutoServiceTests {
         var criado = service.cadastrar(new CadastrarProdutoDto(1, new BigDecimal("10.50")));
         assertThat(criado.getEstoque()).isZero();
         assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque()).isZero();
-        service.entrada(new SomarEstoqueDto(1, 15));
-        assertThat(service.entrada(new SomarEstoqueDto(1, 10))).isEqualTo(25);
+        service.entrada(new MovimentoEstoqueDto(1, 15));
+        assertThat(service.entrada(new MovimentoEstoqueDto(1, 10))).isEqualTo(25);
         var produto = service.consultar(new BuscarProdutoDto(1));
         assertThat(produto.getPreco()).isEqualByComparingTo("10.50");
         assertThat(produto.getEstoque()).isEqualTo(25);
@@ -80,11 +80,11 @@ class ProdutoServiceTests {
     void ausenciaEEstouroTemErrosDeNegocio() {
         assertThatThrownBy(() -> service.consultar(new BuscarProdutoDto(1)))
                 .isInstanceOf(ProdutoNaoEncontradoException.class);
-        assertThatThrownBy(() -> service.entrada(new SomarEstoqueDto(1, 1)))
+        assertThatThrownBy(() -> service.entrada(new MovimentoEstoqueDto(1, 1)))
                 .isInstanceOf(ProdutoNaoEncontradoException.class);
         service.cadastrar(new CadastrarProdutoDto(1, BigDecimal.ONE));
-        service.entrada(new SomarEstoqueDto(1, Integer.MAX_VALUE));
-        assertThatThrownBy(() -> service.entrada(new SomarEstoqueDto(1, 1)))
+        service.entrada(new MovimentoEstoqueDto(1, Integer.MAX_VALUE));
+        assertThatThrownBy(() -> service.entrada(new MovimentoEstoqueDto(1, 1)))
                 .isInstanceOf(DadosInvalidosException.class)
                 .hasMessage("produto.estoque.limite.excedido");
         assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque())
@@ -99,7 +99,7 @@ class ProdutoServiceTests {
                 .isInstanceOf(ConstraintViolationException.class);
         assertThatThrownBy(() -> service.cadastrar(new CadastrarProdutoDto(codigo, BigDecimal.ONE)))
                 .isInstanceOf(ConstraintViolationException.class);
-        assertThatThrownBy(() -> service.entrada(new SomarEstoqueDto(codigo, 1)))
+        assertThatThrownBy(() -> service.entrada(new MovimentoEstoqueDto(codigo, 1)))
                 .isInstanceOf(ConstraintViolationException.class);
     }
 
@@ -122,7 +122,7 @@ class ProdutoServiceTests {
     @NullSource
     @ValueSource(ints = {0, -1})
     void rejeitaQuantidadeInvalida(Integer quantidade) {
-        assertThatThrownBy(() -> service.entrada(new SomarEstoqueDto(1, quantidade)))
+        assertThatThrownBy(() -> service.entrada(new MovimentoEstoqueDto(1, quantidade)))
                 .isInstanceOf(ConstraintViolationException.class);
     }
 

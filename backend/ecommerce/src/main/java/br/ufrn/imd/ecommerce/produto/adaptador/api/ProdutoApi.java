@@ -2,7 +2,7 @@ package br.ufrn.imd.ecommerce.produto.adaptador.api;
 
 import br.ufrn.imd.ecommerce.compartilhado.Problema;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.CadastrarProdutoRequest;
-import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.SomarEstoqueRequest;
+import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.MovimentoEstoqueRequest;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.EstoqueDto;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.ProdutoDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -174,10 +174,10 @@ public interface ProdutoApi {
                                             schema =
                                                     @Schema(
                                                             implementation =
-                                                                    SomarEstoqueRequest.class,
+                                                                    MovimentoEstoqueRequest.class,
                                                             requiredProperties = {"quantidade"}),
                                             examples =
                                                     @ExampleObject(value = "{\"quantidade\":10}")))
                     @RequestBody
-                    SomarEstoqueRequest request);
+                    MovimentoEstoqueRequest request);
 }

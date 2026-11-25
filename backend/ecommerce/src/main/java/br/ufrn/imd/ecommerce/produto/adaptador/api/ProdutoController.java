@@ -1,7 +1,7 @@
 package br.ufrn.imd.ecommerce.produto.adaptador.api;
 
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.CadastrarProdutoRequest;
-import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.SomarEstoqueRequest;
+import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.MovimentoEstoqueRequest;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.EstoqueDto;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.ProdutoDto;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.mapper.ProdutoMapper;
@@ -46,9 +46,9 @@ public class ProdutoController implements ProdutoApi {
 
     /** {@inheritDoc} */
     @Override
-    public ResponseEntity<EstoqueDto> entrada(Integer codigo, SomarEstoqueRequest request) {
+    public ResponseEntity<EstoqueDto> entrada(Integer codigo, MovimentoEstoqueRequest request) {
         exigirCorpo(request);
-        Integer estoque = service.entrada(mapper.paraReposicao(codigo, request));
+        Integer estoque = service.entrada(mapper.paraMovimento(codigo, request));
         return ResponseEntity.ok(new EstoqueDto(codigo, estoque));
     }
 
