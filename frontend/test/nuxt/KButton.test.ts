@@ -27,4 +27,19 @@ describe('KButton', () => {
     expect(c.find('a').exists()).toBe(false)
     expect(c.find('button').attributes('disabled')).toBeDefined()
   })
+
+  it('carregando desabilita, marca aria-busy e mostra o indicador', async () => {
+    const c = await mountSuspended(KButton, { props: { carregando: true, to: '/carrinho' }, slots: { default: 'Enviando…' } })
+    const botao = c.find('button')
+    expect(botao.attributes('disabled')).toBeDefined()
+    expect(botao.attributes('aria-busy')).toBe('true')
+    expect(botao.find('.giro').exists()).toBe(true)
+    expect(c.find('a').exists()).toBe(false)
+  })
+
+  it('sem carregando não marca aria-busy', async () => {
+    const c = await mountSuspended(KButton, { slots: { default: 'Ok' } })
+    expect(c.find('button').attributes('aria-busy')).toBeUndefined()
+    expect(c.find('.giro').exists()).toBe(false)
+  })
 })
