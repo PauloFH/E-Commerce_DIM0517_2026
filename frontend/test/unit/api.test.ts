@@ -14,6 +14,11 @@ describe('normalizarErro', () => {
       .toEqual({ status: 500, title: 'generico', detail: 'generico' })
   })
 
+  it('mantém só os erros de validação bem formados', () => {
+    const erro = { response: {}, status: 400, data: { status: 400, detail: 'requisicao.dados.invalidos', erros: [{ campo: 'preco', chave: 'produto.preco.positivo' }, { campo: 1 }, null] } }
+    expect(normalizarErro(erro, 'rede', 'generico').erros).toEqual([{ campo: 'preco', chave: 'produto.preco.positivo' }])
+  })
+
   it('erro de rede vira status 0', () => {
     expect(normalizarErro(new TypeError('Failed to fetch'), 'sem rede', 'generico'))
       .toEqual({ status: 0, title: 'sem rede', detail: 'sem rede' })

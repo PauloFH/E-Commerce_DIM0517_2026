@@ -141,7 +141,8 @@
         "codigoObrigatorio": "Informe o código do produto.",
         "codigoInvalido": "Use um número inteiro maior que zero.",
         "codigoDuplicado": "Já existe um produto com o código {codigo}.",
-        "precoObrigatorio": "Informe um preço maior que zero."
+        "precoObrigatorio": "Informe um preço maior que zero.",
+        "precoAcimaDoLimite": "O preço máximo é {maximo}."
       }
     },
     "estoque": {

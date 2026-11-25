@@ -3,6 +3,7 @@ export interface ProblemDetail {
   title: string
   detail: string
   codigoErro?: string
+  erros?: { campo: string, chave: string }[]
 }
 
 export interface Produto {
@@ -41,5 +42,10 @@ export function normalizarErro(erro: unknown, mensagemRede: string, mensagemGene
   }
   const codigoErro = texto(dados.codigoErro)
   if (codigoErro) problema.codigoErro = codigoErro
+  if (Array.isArray(dados.erros)) {
+    problema.erros = (dados.erros as Record<string, unknown>[])
+      .filter(e => e && typeof e.campo === 'string' && typeof e.chave === 'string')
+      .map(e => ({ campo: e.campo as string, chave: e.chave as string }))
+  }
   return problema
 }

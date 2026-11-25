@@ -44,6 +44,32 @@ describe('tela Novo produto', () => {
     expect(tela.findAll('input')[0]!.attributes('aria-invalid')).toBe('true')
   })
 
+  it('corrigir o campo tira o erro antigo', async () => {
+    const tela = await preencher('abc', '5990')
+    await tela.find('form').trigger('submit')
+    expect(tela.text()).toContain('Use um número inteiro maior que zero.')
+
+    await tela.findAll('input')[0]!.setValue('12')
+    expect(tela.text()).not.toContain('Use um número inteiro maior que zero.')
+  })
+
+  it('preço acima do limite vira erro, sem trocar o valor digitado', async () => {
+    const tela = await preencher('123', '1000000000000')
+    await tela.find('form').trigger('submit')
+
+    expect(cadastrarProduto).not.toHaveBeenCalled()
+    expect(tela.text()).toContain('O preço máximo é')
+  })
+
+  it('400 da API com erro de campo aparece no campo', async () => {
+    cadastrarProduto.mockRejectedValue({ status: 400, title: 'Bad Request', detail: 'requisicao.dados.invalidos', erros: [{ campo: 'dados.preco', chave: 'produto.preco.positivo' }] })
+    const tela = await preencher('123', '5990')
+    await tela.find('form').trigger('submit')
+
+    await vi.waitFor(() => expect(tela.text()).toContain('Informe um preço maior que zero.'))
+    expect(tela.findAll('input')[1]!.attributes('aria-invalid')).toBe('true')
+  })
+
   it('no sucesso guarda o produto, limpa o formulário e oferece repor estoque', async () => {
     cadastrarProduto.mockResolvedValue({ codigo: 321, preco: 59.9, estoque: 0 })
     const tela = await preencher('321', '5990')

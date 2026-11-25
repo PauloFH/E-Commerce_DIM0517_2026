@@ -26,9 +26,30 @@ function mascararPreco(evento: Event) {
   const campo = evento.target as HTMLInputElement
   centavos.value = centavosDe(campo.value)
   campo.value = precoTexto.value
+  erroPreco.value = null
 }
 
+watch(codigoTexto, () => {
+  erroCodigo.value = null
+})
+
 const codigoPrevia = computed(() => (validarCodigo(codigoTexto.value) ? null : Number(codigoTexto.value)))
+
+// o detail da API ainda vem como chave
+function mostrarErroDaApi(problema: ProblemDetail, codigo: number) {
+  if (problema.status === 409) {
+    erroCodigo.value = { chave: 'paginas.novoProduto.erros.codigoDuplicado', parametros: { codigo } }
+    return
+  }
+  // no 400 o campo vem como caminho (ex.: dados.preco); vale o último trecho
+  const campos = new Set(problema.erros?.map(e => e.campo.split('.').pop()))
+  if (problema.status === 400 && (campos.has('codigo') || campos.has('preco'))) {
+    if (campos.has('codigo')) erroCodigo.value = { chave: 'paginas.novoProduto.erros.codigoInvalido' }
+    if (campos.has('preco')) erroPreco.value = { chave: 'paginas.novoProduto.erros.precoObrigatorio' }
+    return
+  }
+  erroGeral.value = { chave: problema.status === 0 ? 'erros.rede' : 'erros.generico' }
+}
 
 // guarda a chave, e não o texto, para a mensagem acompanhar a troca de idioma
 const traduzir = (m: Mensagem | null) => (m ? t(m.chave, m.parametros ?? {}) : undefined)
@@ -38,7 +59,10 @@ function validar(): boolean {
   erroCodigo.value = codigo === 'obrigatorio'
     ? { chave: 'paginas.novoProduto.erros.codigoObrigatorio' }
     : codigo === 'invalido' ? { chave: 'paginas.novoProduto.erros.codigoInvalido' } : null
-  erroPreco.value = validarPreco(centavos.value) ? { chave: 'paginas.novoProduto.erros.precoObrigatorio' } : null
+  const preco = validarPreco(centavos.value)
+  erroPreco.value = preco === 'obrigatorio'
+    ? { chave: 'paginas.novoProduto.erros.precoObrigatorio' }
+    : preco === 'acimaDoLimite' ? { chave: 'paginas.novoProduto.erros.precoAcimaDoLimite', parametros: { maximo: formatarPreco(9_999_999_999.99, locale.value) } } : null
   return !erroCodigo.value && !erroPreco.value
 }
 
@@ -46,20 +70,21 @@ async function cadastrar() {
   criado.value = null
   erroGeral.value = null
   if (!validar() || enviando.value) return
-  const codigo = Number(codigoTexto.value.trim())
+  const enviado = { texto: codigoTexto.value, centavos: centavos.value }
+  const codigo = Number(enviado.texto.trim())
   enviando.value = true
   try {
-    const produto = await cadastrarProduto(codigo, centavos.value / 100)
+    const produto = await cadastrarProduto(codigo, enviado.centavos / 100)
     registrar(produto)
     criado.value = produto.codigo
-    codigoTexto.value = ''
-    centavos.value = 0
+    // só limpa se o vendedor não começou a digitar o próximo produto durante o envio
+    if (codigoTexto.value === enviado.texto && centavos.value === enviado.centavos) {
+      codigoTexto.value = ''
+      centavos.value = 0
+    }
   }
   catch (erro) {
-    const problema = erro as ProblemDetail
-    // o detail da API ainda vem como chave (#4); a tela usa as próprias mensagens
-    if (problema.status === 409) erroCodigo.value = { chave: 'paginas.novoProduto.erros.codigoDuplicado', parametros: { codigo } }
-    else erroGeral.value = { chave: problema.status === 0 ? 'erros.rede' : 'erros.generico' }
+    mostrarErroDaApi(erro as ProblemDetail, codigo)
   }
   finally {
     enviando.value = false

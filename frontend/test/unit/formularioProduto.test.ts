@@ -33,8 +33,8 @@ describe('centavosDe', () => {
     expect(centavosDe('R$ ')).toBe(0)
   })
 
-  it('limita ao maior preço aceito', () => {
-    expect(centavosDe('99999999999999')).toBe(999_999_999_999)
+  it('não reduz um valor acima do limite', () => {
+    expect(centavosDe('99999999999999')).toBe(99_999_999_999_999)
   })
 })
 
@@ -42,5 +42,10 @@ describe('validarPreco', () => {
   it('exige preço maior que zero', () => {
     expect(validarPreco(1)).toBeNull()
     expect(validarPreco(0)).toBe('obrigatorio')
+  })
+
+  it('acusa preço acima de R$ 9.999.999.999,99', () => {
+    expect(validarPreco(999_999_999_999)).toBeNull()
+    expect(validarPreco(1_000_000_000_000)).toBe('acimaDoLimite')
   })
 })

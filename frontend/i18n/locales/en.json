@@ -141,7 +141,8 @@
         "codigoObrigatorio": "Enter the product code.",
         "codigoInvalido": "Use a whole number greater than zero.",
         "codigoDuplicado": "A product with code {codigo} already exists.",
-        "precoObrigatorio": "Enter a price greater than zero."
+        "precoObrigatorio": "Enter a price greater than zero.",
+        "precoAcimaDoLimite": "The maximum price is {maximo}."
       }
     },
     "estoque": {
