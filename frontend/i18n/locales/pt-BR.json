@@ -128,7 +128,22 @@
     },
     "novoProduto": {
       "titulo": "Novo produto",
-      "texto": "Aqui você vai cadastrar um produto informando o código e o preço. Todo produto novo começa com estoque 0."
+      "texto": "O produto começa com estoque 0. Depois, reponha o estoque na tela Estoque.",
+      "codigo": "Código",
+      "codigoExemplo": "Ex.: 123",
+      "preco": "Preço",
+      "cadastrar": "Cadastrar produto",
+      "previa": "Prévia na loja",
+      "previaTexto": "Assim o produto aparece na vitrine.",
+      "sucesso": "Produto {codigo} criado com estoque 0.",
+      "reporEstoque": "Repor estoque",
+      "erros": {
+        "codigoObrigatorio": "Informe o código do produto.",
+        "codigoInvalido": "Use um número inteiro maior que zero.",
+        "codigoDuplicado": "Já existe um produto com o código {codigo}.",
+        "precoObrigatorio": "Informe um preço maior que zero.",
+        "precoAcimaDoLimite": "O preço máximo é {maximo}."
+      }
     },
     "estoque": {
       "titulo": "Gerenciar estoque",
