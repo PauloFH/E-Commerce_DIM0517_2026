@@ -181,6 +181,9 @@ onMounted(async () => {
 .pagina { display: flex; flex-direction: column; gap: var(--spacing-6); padding-bottom: var(--spacing-12); }
 .secundario { color: var(--color-text-secondary); }
 
+/* o foco programático no título só serve ao leitor de tela */
+h1:focus-visible { outline: none; }
+
 .confirmacao { display: flex; align-items: center; gap: var(--spacing-4); }
 .cabecalho { display: flex; flex-direction: column; gap: var(--spacing-2); }
 
@@ -208,7 +211,9 @@ onMounted(async () => {
 
 .tabela { width: 100%; border-collapse: collapse; }
 .tabela th,
-.tabela td { padding: var(--spacing-4) var(--spacing-5); text-align: left; font-weight: 400; }
+.tabela td { padding: var(--spacing-4) var(--spacing-5); text-align: left; }
+.tabela td,
+.tabela tbody th { font-weight: 400; }
 
 thead tr { background: var(--color-bg-info); color: var(--color-text-secondary); }
 thead th { padding-block: var(--spacing-3); font-weight: 600; }
@@ -260,8 +265,8 @@ tfoot tr { border-top: 1px solid var(--color-border-default); background: var(--
     padding: var(--spacing-4);
   }
 
-  tbody th,
-  tbody td { padding: 0; }
+  .tabela tbody th,
+  .tabela tbody td { padding: 0; }
   .imagem { display: none; }
   .produto { grid-area: produto; align-items: flex-start; }
   .subtotal { grid-area: subtotal; }
@@ -279,8 +284,8 @@ tfoot tr { border-top: 1px solid var(--color-border-default); background: var(--
   }
 
   tfoot tr { display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-4); }
-  tfoot th,
-  tfoot td { padding: 0; }
+  .tabela tfoot th,
+  .tabela tfoot td { padding: 0; }
 
   .continuar { align-self: stretch; }
 }
