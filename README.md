@@ -8,7 +8,7 @@ Emanuel Kywal Pinto Cabral Filho e Paulo Roberto Fernandes Holanda
 
 ## Backend
 
-O backend é feito em Spring Boot 4 e usa o Java 25. Não é preciso instalar o Maven: o Maven Wrapper (`mvnw`) já vem no projeto. Para subir a API:
+O backend é feito em Spring Boot 4 e usa o Java 25. Não é preciso instalar o Maven: o Maven Wrapper (`mvnw`) já vem no projeto. No Linux e no macOS, o `mvnw` precisa do `unzip` (no Ubuntu/WSL, `sudo apt install unzip`), porque confere o Maven baixado com o SHA-256 do `.zip`. Para subir a API:
 
 ```bash
 cd backend/ecommerce
