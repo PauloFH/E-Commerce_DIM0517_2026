@@ -132,7 +132,29 @@
     },
     "estoque": {
       "titulo": "Gerenciar estoque",
-      "texto": "Aqui você vai consultar o estoque de um produto e registrar entradas e saídas de unidades."
+      "texto": "Consulte o estoque de um produto e registre entradas e saídas.",
+      "codigo": "Código do produto",
+      "consultar": "Consultar",
+      "resumo": {
+        "codigo": "Código",
+        "preco": "Preço",
+        "precoDesconhecido": "Não informado",
+        "estoque": "Estoque atual",
+        "unidades": "{n} unidade | {n} unidades",
+        "situacao": "Situação"
+      },
+      "abas": "Operações de estoque",
+      "repor": "Repor estoque",
+      "quantidade": "Quantidade",
+      "quantidadeExemplo": "Ex.: 10",
+      "sucesso": "Estoque do produto {codigo}: {antes} → {depois} unidades.",
+      "erros": {
+        "codigoVazio": "Informe o código do produto.",
+        "codigoInvalido": "Use um número inteiro maior que zero.",
+        "naoEncontrado": "Produto {codigo} não encontrado.",
+        "quantidadeInvalida": "Informe uma quantidade inteira maior que zero.",
+        "quantidadeLimite": "Quantidade acima do limite de estoque."
+      }
     }
   },
   "erroPagina": {
