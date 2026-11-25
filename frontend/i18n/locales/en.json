@@ -147,7 +147,29 @@
     },
     "estoque": {
       "titulo": "Manage stock",
-      "texto": "Here you will check a product's stock and record units coming in and going out."
+      "texto": "Check a product's stock and record units coming in and going out.",
+      "codigo": "Product code",
+      "consultar": "Check",
+      "resumo": {
+        "codigo": "Code",
+        "preco": "Price",
+        "precoDesconhecido": "Not available",
+        "estoque": "Current stock",
+        "unidades": "{n} unit | {n} units",
+        "situacao": "Status"
+      },
+      "abas": "Stock operations",
+      "repor": "Restock",
+      "quantidade": "Quantity",
+      "quantidadeExemplo": "E.g. 10",
+      "sucesso": "Stock for product {codigo}: {antes} → {depois} units.",
+      "erros": {
+        "codigoVazio": "Enter the product code.",
+        "codigoInvalido": "Use a whole number greater than zero.",
+        "naoEncontrado": "Product {codigo} not found.",
+        "quantidadeInvalida": "Enter a whole quantity greater than zero.",
+        "quantidadeLimite": "Quantity above the stock limit."
+      }
     }
   },
   "erroPagina": {
