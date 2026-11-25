@@ -1,0 +1,5 @@
+[tools]
+java = "temurin-25"
+bun = "1.4.5"
+node = "24"
+just = "1.59.0"
