@@ -53,6 +53,14 @@ class ProdutoServiceTests {
     }
 
     @Test
+    void criaSoComORepositorioEValidaMesmoAssim() {
+        var semValidatorExplicito = new ProdutoService(new ProdutoRepositoryEmMemoria());
+        assertThatThrownBy(() -> semValidatorExplicito.cadastrar(new CadastrarProdutoDto(null, BigDecimal.ONE)))
+                .isInstanceOf(ConstraintViolationException.class);
+        assertThat(semValidatorExplicito.cadastrar(new CadastrarProdutoDto(1, BigDecimal.ONE)).getEstoque()).isZero();
+    }
+
+    @Test
     void duplicacaoNaoSobrescreveProduto() {
         service.cadastrar(new CadastrarProdutoDto(1, BigDecimal.ONE));
         assertThatThrownBy(() -> service.cadastrar(new CadastrarProdutoDto(1, BigDecimal.TEN)))
