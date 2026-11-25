@@ -56,27 +56,33 @@ function tratarFalha(erro: unknown, numero: number) {
   }
 }
 
+// só a consulta mais recente atualiza a tela; uma resposta atrasada é descartada
+let ultimaConsulta = 0
+
 async function consultar() {
   limparMensagens()
+  // o formulário de reposição some até o novo produto carregar, para nunca repor no anterior
+  produto.value = undefined
   const resultado = validarCodigo(codigo.value)
   if ('erro' in resultado) {
-    produto.value = undefined
     erroCodigo.value = resultado.erro
     return
   }
   const numero = resultado.valor
-  await navigateTo({ query: { codigo: String(numero) } }, { replace: true })
+  const consulta = ++ultimaConsulta
   ocupado.value = true
   try {
+    await navigateTo({ query: { codigo: String(numero) } }, { replace: true })
     const { estoque } = await consultarEstoque(numero)
+    if (consulta !== ultimaConsulta) return
     produto.value = { codigo: numero, estoque }
     registrar({ codigo: numero, estoque })
   }
   catch (erro) {
-    tratarFalha(erro, numero)
+    if (consulta === ultimaConsulta) tratarFalha(erro, numero)
   }
   finally {
-    ocupado.value = false
+    if (consulta === ultimaConsulta) ocupado.value = false
   }
 }
 

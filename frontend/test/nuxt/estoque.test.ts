@@ -38,6 +38,20 @@ describe('página Gerenciar estoque', () => {
     expect(pagina.find('dl').exists()).toBe(false)
   })
 
+  it('consultar outro código esconde a reposição do produto anterior, mesmo se a consulta falhar', async () => {
+    const pagina = await abrir()
+    expect(pagina.find('dl').exists()).toBe(true)
+
+    consultarEstoque.mockRejectedValue({ status: 0 })
+    await pagina.find('input').setValue('456')
+    await pagina.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(pagina.find('dl').exists()).toBe(false)
+    expect(pagina.find('[role="tabpanel"]').exists()).toBe(false)
+    expect(darEntrada).not.toHaveBeenCalled()
+  })
+
   it('quantidade inválida não chama a API', async () => {
     const pagina = await abrir()
     await pagina.find('[role="tabpanel"] input').setValue('0')
