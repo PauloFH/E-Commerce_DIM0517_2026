@@ -82,3 +82,21 @@ Erros usam `application/problem+json`, com `type: about:blank`, `title`, `status
 O adaptador em memória usa `ConcurrentHashMap` e um único monitor em todas as operações, inclusive leituras, impedindo observar uma baixa parcial. Atualizações substituem produtos imutáveis. Um futuro adaptador de banco deverá preservar os mesmos contratos e garantir atomicidade entre instâncias.
 
 **Os dados são perdidos ao reiniciar. Cada instância da API possui seu próprio estoque.** Venda, persistência durável, listagem, edição e exclusão não estão incluídas nesta entrega.
+
+## Frontend
+
+O front é feito em Nuxt 4 e usa o [Bun](https://bun.sh) 1.4. Para subir em modo de desenvolvimento:
+
+```bash
+cd frontend
+bun install
+bun run dev
+```
+
+Também funciona com npm: `npm install` e `npm run dev` (os demais comandos abaixo valem com `npm run` no lugar de `bun run`).
+
+A loja abre em `http://localhost:3000`.
+
+As chamadas a `/loja/**` são repassadas pelo próprio servidor do front para a API em `http://localhost:8080`; para apontar para outro endereço, defina a variável `NUXT_API_BASE`.
+
+Outros comandos úteis: `bun run lint` confere o padrão do código, `bun run test` roda os testes e `bun run build` gera a versão de produção em `.output/`.
