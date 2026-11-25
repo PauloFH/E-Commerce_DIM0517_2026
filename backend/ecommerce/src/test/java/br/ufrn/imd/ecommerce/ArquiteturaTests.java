@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.modulith.core.ApplicationModules;
+import org.springframework.modulith.docs.Documenter;
 
 class ArquiteturaTests {
     private static final JavaClasses CLASSES =
@@ -32,6 +33,12 @@ class ArquiteturaTests {
         // contains, e não containsExactly: novos módulos não quebram o teste
         assertThat(modules.stream().map(module -> module.getIdentifier().toString()))
                 .contains("produto", "compartilhado");
+    }
+
+    @Test
+    void geraDocumentacaoDosModulos() {
+        // diagramas C4/PlantUML e canvas de cada módulo em target/spring-modulith-docs
+        new Documenter(ApplicationModules.of(EcommerceApplication.class)).writeDocumentation();
     }
 
     @Test
