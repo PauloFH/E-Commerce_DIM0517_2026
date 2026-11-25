@@ -6,20 +6,23 @@ Sistema simples de controle de produtos e estoque de uma loja virtual, feito par
 
 Emanuel Kywal Pinto Cabral Filho e Paulo Roberto Fernandes Holanda
 
-## Executar e verificar
+## Backend
 
-O backend usa Java 25, Spring Boot 4 e Maven Wrapper. Os comandos abaixo são executados em `backend/ecommerce`:
+O backend é feito em Spring Boot 4 e usa o Java 25. Não é preciso instalar o Maven: o Maven Wrapper (`mvnw`) já vem no projeto. Para subir a API:
 
 ```bash
-./mvnw verify
+cd backend/ecommerce
 ./mvnw spring-boot:run
 ```
 
-A API inicia em `http://localhost:8080`, sem banco ou Docker. O primeiro build precisa de acesso ao Maven Central.
+No Windows, use `mvnw.cmd spring-boot:run` no lugar de `./mvnw spring-boot:run` (os demais comandos abaixo seguem a mesma troca).
+
+A API abre em `http://localhost:8080`, sem banco ou Docker. A primeira execução baixa o Maven e as dependências, então precisa de acesso à internet.
 
 - Swagger UI: http://localhost:8080/swagger-ui/index.html
 - OpenAPI JSON: http://localhost:8080/v3/api-docs
-- Javadoc: executar `./mvnw javadoc:javadoc -Ddoclint=all`; saída em `target/reports/apidocs/index.html`.
+
+Outros comandos úteis: `./mvnw verify` compila e roda os testes, e `./mvnw javadoc:javadoc -Ddoclint=all` gera o Javadoc em `target/reports/apidocs/index.html`.
 
 ## Arquitetura
 
