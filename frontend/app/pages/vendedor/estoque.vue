@@ -20,9 +20,22 @@ const erroQuantidade = ref<ErroCampo>()
 const falha = ref<'erros.rede' | 'erros.generico'>()
 const sucesso = ref<{ codigo: number, antes: number, depois: number }>()
 
-// para a #8 basta acrescentar "Dar baixa" aqui e um painel com o mesmo id
 const abas = computed(() => [{ id: 'repor', rotulo: t('paginas.estoque.repor') }])
-const abaAtiva = ref('repor')
+const abaAtiva = ref(abas.value.find(a => a.id === route.query.aba)?.id ?? 'repor')
+
+function trocarAba(id: string) {
+  abaAtiva.value = id
+  navigateTo({ query: { ...route.query, aba: id } }, { replace: true })
+}
+
+function teclaAba(evento: KeyboardEvent) {
+  const ids = abas.value.map(a => a.id)
+  const destino = indiceDaTecla(evento.key, ids.indexOf(abaAtiva.value), ids.length)
+  if (destino === undefined) return
+  evento.preventDefault()
+  trocarAba(ids[destino]!)
+  nextTick(() => document.getElementById(`aba-${ids[destino]}`)?.focus())
+}
 
 // o preço só existe no que este navegador já viu; a API de estoque não devolve
 const preco = computed(() => produtos.value.find(p => p.codigo === produto.value?.codigo)?.preco)
@@ -72,7 +85,7 @@ async function consultar() {
   const consulta = ++ultimaConsulta
   ocupado.value = true
   try {
-    await navigateTo({ query: { codigo: String(numero) } }, { replace: true })
+    await navigateTo({ query: { ...route.query, codigo: String(numero) } }, { replace: true })
     const { estoque } = await consultarEstoque(numero)
     if (consulta !== ultimaConsulta) return
     produto.value = { codigo: numero, estoque }
@@ -221,6 +234,7 @@ onMounted(() => {
             class="abas"
             role="tablist"
             :aria-label="t('paginas.estoque.abas')"
+            @keydown="teclaAba"
           >
             <button
               v-for="aba in abas"
@@ -231,7 +245,8 @@ onMounted(() => {
               class="aba label"
               :aria-selected="abaAtiva === aba.id"
               :aria-controls="`painel-${aba.id}`"
-              @click="abaAtiva = aba.id"
+              :tabindex="abaAtiva === aba.id ? 0 : -1"
+              @click="trocarAba(aba.id)"
             >
               {{ aba.rotulo }}
             </button>

@@ -10,8 +10,8 @@ const { consultarEstoque, darEntrada } = vi.hoisted(() => ({
 
 mockNuxtImport('useLoja', () => () => ({ consultarEstoque, darEntrada }))
 
-async function abrir() {
-  const pagina = await mountSuspended(Pagina, { route: '/vendedor/estoque?codigo=123' })
+async function abrir(consulta = 'codigo=123') {
+  const pagina = await mountSuspended(Pagina, { route: `/vendedor/estoque?${consulta}` })
   await flushPromises()
   return pagina
 }
@@ -70,5 +70,17 @@ describe('página Gerenciar estoque', () => {
     expect(pagina.find('[role="status"]').text()).toBe('Estoque do produto 123: 15 → 25 unidades.')
     expect(pagina.find('dl').text()).toContain('25 unidades')
     expect(pagina.find<HTMLInputElement>('[role="tabpanel"] input').element.value).toBe('')
+  })
+
+  it('aba desconhecida na URL cai na primeira e o teclado navega entre as abas', async () => {
+    const pagina = await abrir('codigo=123&aba=inexistente')
+    const aba = pagina.find('[role="tab"]')
+    expect(aba.attributes('aria-selected')).toBe('true')
+    expect(aba.attributes('tabindex')).toBe('0')
+    expect(aba.attributes('aria-controls')).toBe('painel-repor')
+
+    await pagina.find('[role="tablist"]').trigger('keydown', { key: 'End' })
+    expect(pagina.find('[role="tab"]').attributes('aria-selected')).toBe('true')
+    expect(pagina.find('[role="tabpanel"]').attributes('aria-labelledby')).toBe('aba-repor')
   })
 })
