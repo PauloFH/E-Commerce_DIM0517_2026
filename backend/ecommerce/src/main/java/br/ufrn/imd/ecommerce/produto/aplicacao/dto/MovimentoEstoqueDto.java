@@ -4,12 +4,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 /**
- * Entrada da reposição de estoque.
+ * Entrada de uma movimentação de estoque (entrada ou saída).
  *
  * @param codigo identificador obrigatório e positivo
- * @param quantidade unidades obrigatórias e positivas a acrescentar
+ * @param quantidade unidades obrigatórias e positivas a movimentar
  */
-public record SomarEstoqueDto(
+public record MovimentoEstoqueDto(
         @NotNull(message = "produto.codigo.obrigatorio")
                 @Positive(message = "produto.codigo.positivo")
                 Integer codigo,

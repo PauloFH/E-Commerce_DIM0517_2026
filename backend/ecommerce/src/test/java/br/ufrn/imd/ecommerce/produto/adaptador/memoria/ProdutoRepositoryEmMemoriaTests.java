@@ -3,6 +3,7 @@ package br.ufrn.imd.ecommerce.produto.adaptador.memoria;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import br.ufrn.imd.ecommerce.produto.aplicacao.porta.ResultadoBaixa;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -44,13 +45,59 @@ class ProdutoRepositoryEmMemoriaTests {
         Map<Integer, Integer> quantidades = new LinkedHashMap<>();
         quantidades.put(1, 10);
         quantidades.put(2, 101);
-        assertThat(repository.baixarEstoque(quantidades)).isFalse();
+        assertThat(repository.baixarEstoque(quantidades))
+                .isEqualTo(new ResultadoBaixa.EstoqueInsuficiente(2, 100));
         assertEstoques(100, 100);
-        assertThat(repository.baixarEstoque(Map.of(1, 10, 99, 1))).isFalse();
+        assertThat(repository.baixarEstoque(Map.of(1, 10, 99, 1)))
+                .isEqualTo(new ResultadoBaixa.ProdutoInexistente(99));
         assertEstoques(100, 100);
-        assertThat(repository.baixarEstoque(Map.of(1, 10, 2, 100))).isTrue();
+        assertThat(repository.baixarEstoque(Map.of(1, 10, 2, 100)))
+                .isInstanceOf(ResultadoBaixa.Baixado.class);
         assertEstoques(90, 0);
-        assertThat(repository.baixarEstoque(Map.of())).isTrue();
+        assertThat(repository.baixarEstoque(Map.of())).isEqualTo(baixado(Map.of()));
+    }
+
+    @Test
+    void baixaInformaProdutosComEstoqueEPrecoResultantes() {
+        var resultado = (ResultadoBaixa.Baixado) repository.baixarEstoque(Map.of(1, 40, 2, 100));
+
+        assertThat(resultado.produtos()).containsOnlyKeys(1, 2);
+        assertThat(resultado.produtos().get(1).getEstoque()).isEqualTo(60);
+        assertThat(resultado.produtos().get(1).getPreco()).isEqualByComparingTo(BigDecimal.ONE);
+        assertThat(resultado.produtos().get(2).getEstoque()).isZero();
+        assertThat(resultado.produtos().get(2).getPreco()).isEqualByComparingTo(BigDecimal.TEN);
+        assertThatThrownBy(() -> resultado.produtos().clear())
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
+    void baixaQueZeraOEstoqueEhAceita() {
+        assertThat(repository.baixarEstoque(Map.of(1, 100)))
+                .isInstanceOf(ResultadoBaixa.Baixado.class);
+        assertEstoques(0, 100);
+    }
+
+    @Test
+    void produtoInexistenteTemPrecedenciaSobreEstoqueInsuficiente() {
+        Map<Integer, Integer> quantidades = new LinkedHashMap<>();
+        quantidades.put(1, 101);
+        quantidades.put(99, 1);
+        quantidades.put(98, 1);
+
+        assertThat(repository.baixarEstoque(quantidades))
+                .isEqualTo(new ResultadoBaixa.ProdutoInexistente(99));
+        assertEstoques(100, 100);
+    }
+
+    @Test
+    void estoqueInsuficienteInformaPrimeiroItemNaOrdemDoMapa() {
+        Map<Integer, Integer> quantidades = new LinkedHashMap<>();
+        quantidades.put(2, 101);
+        quantidades.put(1, 101);
+
+        assertThat(repository.baixarEstoque(quantidades))
+                .isEqualTo(new ResultadoBaixa.EstoqueInsuficiente(2, 100));
+        assertEstoques(100, 100);
     }
 
     @Test
@@ -75,7 +122,8 @@ class ProdutoRepositoryEmMemoriaTests {
                 for (int j = 0; j < 100; j++) {
                     repository.somarEstoque(1, 1);
                     repository.somarEstoque(2, 1);
-                    assertThat(repository.baixarEstoque(Map.of(1, 1, 2, 1))).isTrue();
+                    assertThat(repository.baixarEstoque(Map.of(1, 1, 2, 1)))
+                            .isInstanceOf(ResultadoBaixa.Baixado.class);
                 }
                 return null;
             });
@@ -95,19 +143,23 @@ class ProdutoRepositoryEmMemoriaTests {
     @Timeout(15)
     void baixasConcorrentesNaoConsomemAlemDoDisponivel() throws Exception {
         try (var executor = Executors.newFixedThreadPool(8)) {
-            List<Callable<Boolean>> tarefas = new ArrayList<>();
+            List<Callable<ResultadoBaixa>> tarefas = new ArrayList<>();
             for (int i = 0; i < 200; i++) {
                 tarefas.add(() -> repository.baixarEstoque(Map.of(1, 1, 2, 1)));
             }
             int sucessos = 0;
             for (var resultado : executor.invokeAll(tarefas)) {
-                if (resultado.get()) {
+                if (resultado.get() instanceof ResultadoBaixa.Baixado) {
                     sucessos++;
                 }
             }
             assertThat(sucessos).isEqualTo(100);
         }
         assertEstoques(0, 0);
+    }
+
+    private static ResultadoBaixa baixado(Map<Integer, Produto> produtos) {
+        return new ResultadoBaixa.Baixado(produtos);
     }
 
     private void assertEstoques(int primeiro, int segundo) {

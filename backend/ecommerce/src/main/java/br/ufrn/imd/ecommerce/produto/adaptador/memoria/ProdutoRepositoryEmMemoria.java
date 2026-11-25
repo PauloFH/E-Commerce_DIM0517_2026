@@ -1,8 +1,11 @@
 package br.ufrn.imd.ecommerce.produto.adaptador.memoria;
 
 import br.ufrn.imd.ecommerce.produto.aplicacao.porta.ProdutoRepository;
+import br.ufrn.imd.ecommerce.produto.aplicacao.porta.ResultadoBaixa;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -46,8 +49,9 @@ public final class ProdutoRepositoryEmMemoria implements ProdutoRepository {
 
     /** {@inheritDoc} Confere todos os itens antes de publicar qualquer alteração. */
     @Override
-    public synchronized boolean baixarEstoque(Map<Integer, Integer> quantidadesPorCodigo) {
-        Map<Integer, Integer> quantidades = Map.copyOf(quantidadesPorCodigo);
+    public synchronized ResultadoBaixa baixarEstoque(Map<Integer, Integer> quantidadesPorCodigo) {
+        // LinkedHashMap preserva a ordem de iteração do mapa recebido, que define o "primeiro".
+        Map<Integer, Integer> quantidades = new LinkedHashMap<>(quantidadesPorCodigo);
 
         for (var item : quantidades.entrySet()) {
             if (item.getValue() <= 0) {
@@ -55,24 +59,33 @@ public final class ProdutoRepositoryEmMemoria implements ProdutoRepository {
             }
         }
 
-        for (var item : quantidades.entrySet()) {
-            Produto produto = produtos.get(item.getKey());
-
-            if (produto == null || produto.getEstoque() < item.getValue()) {
-                return false;
+        for (var codigo : quantidades.keySet()) {
+            if (!produtos.containsKey(codigo)) {
+                return new ResultadoBaixa.ProdutoInexistente(codigo);
             }
         }
 
         for (var item : quantidades.entrySet()) {
+            int disponivel = produtos.get(item.getKey()).getEstoque();
+
+            if (disponivel < item.getValue()) {
+                return new ResultadoBaixa.EstoqueInsuficiente(item.getKey(), disponivel);
+            }
+        }
+
+        Map<Integer, Produto> baixados = new LinkedHashMap<>();
+
+        for (var item : quantidades.entrySet()) {
             Produto produto = produtos.get(item.getKey());
-            produtos.put(
-                    item.getKey(),
+            Produto atualizado =
                     new Produto(
                             produto.getCodigo(),
                             produto.getPreco(),
-                            produto.getEstoque() - item.getValue()));
+                            produto.getEstoque() - item.getValue());
+            produtos.put(item.getKey(), atualizado);
+            baixados.put(item.getKey(), atualizado);
         }
 
-        return true;
+        return new ResultadoBaixa.Baixado(Collections.unmodifiableMap(baixados));
     }
 }

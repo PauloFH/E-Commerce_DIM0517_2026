@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -98,6 +99,9 @@ class ProdutoApiTests {
                                 .content("{\"quantidade\":" + valor + "}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("O corpo da requisição é inválido."));
+        saida(1, "{\"quantidade\":" + valor + "}")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("O corpo da requisição é inválido."));
     }
 
     @ParameterizedTest
@@ -132,6 +136,9 @@ class ProdutoApiTests {
                                 .content(corpo))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
+        saida(1, corpo)
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
     }
 
     @ParameterizedTest
@@ -162,6 +169,9 @@ class ProdutoApiTests {
                         put("/loja/produto/1/entrada")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(corpo))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Os dados da requisição são inválidos."));
+        saida(1, corpo)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("Os dados da requisição são inválidos."));
     }
@@ -233,6 +243,78 @@ class ProdutoApiTests {
                 .andExpect(jsonPath("$.detail").value("The request body is invalid."));
         mvc.perform(get("/loja/produto/abc/estoque").header("Accept-Language", "en"))
                 .andExpect(jsonPath("$.detail").value("The request parameter is invalid."));
+    }
+
+    @Test
+    void saidaSubtraiDoEstoqueComContratoHttp() throws Exception {
+        int codigo = CODIGOS.incrementAndGet();
+        cadastrar(codigo, 15);
+        saida(codigo, "{\"quantidade\":10}")
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.codigo").value(codigo))
+                .andExpect(jsonPath("$.estoque").value(5))
+                .andExpect(jsonPath("$.*", hasSize(2)));
+        mvc.perform(get("/loja/produto/{codigo}/estoque", codigo))
+                .andExpect(jsonPath("$.estoque").value(5));
+    }
+
+    @Test
+    void saidaQueZeraOEstoqueRetorna200() throws Exception {
+        int codigo = CODIGOS.incrementAndGet();
+        cadastrar(codigo, 15);
+        saida(codigo, "{\"quantidade\":15}")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.codigo").value(codigo))
+                .andExpect(jsonPath("$.estoque").value(0));
+        mvc.perform(get("/loja/produto/{codigo}/estoque", codigo))
+                .andExpect(jsonPath("$.estoque").value(0));
+    }
+
+    @Test
+    void saidaMaiorQueOEstoqueRetorna400SemAlteracao() throws Exception {
+        int codigo = CODIGOS.incrementAndGet();
+        cadastrar(codigo, 15);
+        saida(codigo, "{\"quantidade\":16}")
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value("Estoque insuficiente: há 15 unidades."))
+                .andExpect(jsonPath("$.argumentos[0]").value(15));
+        saida(codigo, "{\"quantidade\":16}", "en")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Insufficient stock: 15 units available."));
+        mvc.perform(get("/loja/produto/{codigo}/estoque", codigo))
+                .andExpect(jsonPath("$.estoque").value(15));
+    }
+
+    @Test
+    void saidaDeProdutoAusenteRetorna404() throws Exception {
+        int codigoAusente = CODIGOS.incrementAndGet();
+        saida(codigoAusente, "{\"quantidade\":1}")
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(
+                        jsonPath("$.detail")
+                                .value("Produto " + codigoAusente + " não encontrado."));
+    }
+
+    @Test
+    void saidaComCodigoInvalidoRetorna400() throws Exception {
+        saida(0, "{\"quantidade\":1}")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Os dados da requisição são inválidos."));
+    }
+
+    private ResultActions saida(int codigo, String corpo) throws Exception {
+        return saida(codigo, corpo, "pt-BR");
+    }
+
+    private ResultActions saida(int codigo, String corpo, String idioma) throws Exception {
+        return mvc.perform(
+                put("/loja/produto/{codigo}/saida", codigo)
+                        .header("Accept-Language", idioma)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(corpo));
     }
 
     private void cadastrar(int codigo, int estoque) throws Exception {

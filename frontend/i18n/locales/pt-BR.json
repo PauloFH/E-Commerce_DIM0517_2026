@@ -120,7 +120,14 @@
   "paginas": {
     "produto": {
       "seo": "Produto {codigo}",
-      "texto": "Aqui você vai ver o estoque atual do produto e escolher quantas unidades levar para o carrinho."
+      "emEstoque": "Em estoque: {n} unidade | Em estoque: {n} unidades",
+      "precoConfirmado": "Preço confirmado no fechamento da compra",
+      "maximo": "Máximo: {n} unidade | Máximo: {n} unidades",
+      "indisponivel": "Indisponível no momento",
+      "adicionarCarrinho": "Adicionar ao carrinho",
+      "comprarAgora": "Comprar agora",
+      "adicionado": "Produto {codigo} adicionado ao carrinho.",
+      "verCarrinho": "Ver carrinho"
     },
     "carrinho": {
       "titulo": "Carrinho",
@@ -128,11 +135,62 @@
     },
     "novoProduto": {
       "titulo": "Novo produto",
-      "texto": "Aqui você vai cadastrar um produto informando o código e o preço. Todo produto novo começa com estoque 0."
+      "texto": "O produto começa com estoque 0. Depois, reponha o estoque na tela Estoque.",
+      "codigo": "Código",
+      "codigoExemplo": "Ex.: 123",
+      "preco": "Preço",
+      "cadastrar": "Cadastrar produto",
+      "previa": "Prévia na loja",
+      "previaTexto": "Assim o produto aparece na vitrine.",
+      "sucesso": "Produto {codigo} criado com estoque 0.",
+      "reporEstoque": "Repor estoque",
+      "erros": {
+        "codigoObrigatorio": "Informe o código do produto.",
+        "codigoInvalido": "Use um número inteiro maior que zero.",
+        "codigoDuplicado": "Já existe um produto com o código {codigo}.",
+        "precoObrigatorio": "Informe um preço maior que zero.",
+        "precoAcimaDoLimite": "O preço máximo é {maximo}."
+      }
     },
     "estoque": {
       "titulo": "Gerenciar estoque",
-      "texto": "Aqui você vai consultar o estoque de um produto e registrar entradas e saídas de unidades."
+      "texto": "Consulte o estoque de um produto e registre entradas e saídas.",
+      "codigo": "Código do produto",
+      "consultar": "Consultar",
+      "resumo": {
+        "codigo": "Código",
+        "preco": "Preço",
+        "precoDesconhecido": "Não informado",
+        "estoque": "Estoque atual",
+        "unidades": "{n} unidade | {n} unidades",
+        "situacao": "Situação"
+      },
+      "abas": "Operações de estoque",
+      "repor": "Repor estoque",
+      "baixa": "Dar baixa",
+      "quantidade": "Quantidade",
+      "quantidadeExemplo": "Ex.: 10",
+      "motivo": "Motivo",
+      "motivoAjuda": "Só para o seu controle; não é enviado ao sistema.",
+      "motivos": {
+        "perda": "Perda",
+        "avaria": "Avaria",
+        "ajuste": "Ajuste"
+      },
+      "confirmacao": "Dar baixa de {n} unidade do produto {codigo}? O estoque vai de {antes} para {depois}. | Dar baixa de {n} unidades do produto {codigo}? O estoque vai de {antes} para {depois}.",
+      "motivoInformativo": "Motivo: {motivo} (apenas informativo)",
+      "confirmarBaixa": "Confirmar baixa",
+      "cancelar": "Cancelar",
+      "sucesso": "Estoque do produto {codigo}: {antes} → {depois} unidades.",
+      "sucessoBaixa": "Baixa registrada: estoque do produto {codigo} foi de {antes} para {n} unidade. | Baixa registrada: estoque do produto {codigo} foi de {antes} para {n} unidades.",
+      "erros": {
+        "codigoVazio": "Informe o código do produto.",
+        "codigoInvalido": "Use um número inteiro maior que zero.",
+        "naoEncontrado": "Produto {codigo} não encontrado.",
+        "quantidadeInvalida": "Informe uma quantidade inteira maior que zero.",
+        "quantidadeLimite": "Quantidade acima do limite de estoque.",
+        "estoqueInsuficiente": "Estoque insuficiente: há {n} unidade. | Estoque insuficiente: há {n} unidades."
+      }
     }
   },
   "erroPagina": {
@@ -146,5 +204,10 @@
     "textoFalha": "Tivemos um problema para abrir esta página. Tente de novo em instantes ou volte para o início.",
     "buscarOutro": "Buscar outro código",
     "voltar": "Voltar para o início"
+  },
+  "quantidade": {
+    "rotulo": "Quantidade",
+    "diminuir": "Diminuir quantidade",
+    "aumentar": "Aumentar quantidade"
   }
 }

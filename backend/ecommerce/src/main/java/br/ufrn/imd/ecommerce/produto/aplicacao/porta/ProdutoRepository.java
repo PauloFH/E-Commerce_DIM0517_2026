@@ -37,10 +37,13 @@ public interface ProdutoRepository {
     Optional<Integer> somarEstoque(Integer codigo, int quantidade);
 
     /**
-     * Baixa todos os itens ou nenhum; mapa vazio é uma operação bem-sucedida.
+     * Baixa todos os itens ou nenhum; mapa vazio é uma operação bem-sucedida. Se algum código não
+     * existe, o resultado é {@code ProdutoInexistente} do primeiro código inexistente na ordem de
+     * iteração do mapa, mesmo que outro item esteja sem estoque; senão, {@code EstoqueInsuficiente}
+     * do primeiro item sem estoque. Nesses casos nada é alterado.
      *
      * @param quantidadesPorCodigo unidades positivas por código, sem valores nulos
-     * @return falso se algum produto não existe ou não tem estoque suficiente
+     * @return {@code Baixado} com os produtos já atualizados, ou o motivo da recusa
      */
-    boolean baixarEstoque(Map<Integer, Integer> quantidadesPorCodigo);
+    ResultadoBaixa baixarEstoque(Map<Integer, Integer> quantidadesPorCodigo);
 }
