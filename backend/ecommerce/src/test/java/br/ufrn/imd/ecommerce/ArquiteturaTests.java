@@ -1,10 +1,14 @@
 package br.ufrn.imd.ecommerce;
 
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.type;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import br.ufrn.imd.ecommerce.compartilhado.ExcecaoNegocio;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
-
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -12,11 +16,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.modulith.core.ApplicationModules;
-
-import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
-import static com.tngtech.archunit.core.domain.JavaClass.Predicates.type;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ArquiteturaTests {
     @Test
@@ -29,28 +28,52 @@ class ArquiteturaTests {
 
     @Test
     void dominioEAplicacaoNaoDependemDosAdaptadores() {
-        var classes = new ClassFileImporter().withImportOption(new ImportOption.DoNotIncludeTests())
-                .importPackages("br.ufrn.imd.ecommerce");
-        var contratoNegocio = type(ExcecaoNegocio.class)
-                .or(type(ExcecaoNegocio.Tipo.class)).or(type(ExcecaoNegocio.Tipo[].class));
-        classes().that().resideInAPackage("..produto.dominio..")
-                .should().onlyDependOnClassesThat(
+        var classes =
+                new ClassFileImporter()
+                        .withImportOption(new ImportOption.DoNotIncludeTests())
+                        .importPackages("br.ufrn.imd.ecommerce");
+        var contratoNegocio =
+                type(ExcecaoNegocio.class)
+                        .or(type(ExcecaoNegocio.Tipo.class))
+                        .or(type(ExcecaoNegocio.Tipo[].class));
+        classes()
+                .that()
+                .resideInAPackage("..produto.dominio..")
+                .should()
+                .onlyDependOnClassesThat(
                         resideInAnyPackage("java..", "..produto.dominio..").or(contratoNegocio))
                 .check(classes);
-        classes().that(contratoNegocio)
-                .should().onlyDependOnClassesThat(resideInAnyPackage("java..").or(contratoNegocio))
+        classes()
+                .that(contratoNegocio)
+                .should()
+                .onlyDependOnClassesThat(resideInAnyPackage("java..").or(contratoNegocio))
                 .check(classes);
-        classes().that().resideInAPackage("..produto.aplicacao..")
-                .should().onlyDependOnClassesThat().resideInAnyPackage(
-                        "java..", "jakarta.validation..", "..produto.aplicacao..", "..produto.dominio..")
+        classes()
+                .that()
+                .resideInAPackage("..produto.aplicacao..")
+                .should()
+                .onlyDependOnClassesThat()
+                .resideInAnyPackage(
+                        "java..",
+                        "jakarta.validation..",
+                        "..produto.aplicacao..",
+                        "..produto.dominio..")
                 .check(classes);
     }
 
     @Test
     void produtoTemSomenteTresAtributos() {
-        var atributos = Arrays.stream(Produto.class.getDeclaredFields())
-                .collect(Collectors.toMap(Field::getName, Field::getType));
-        assertThat(atributos).isEqualTo(Map.of(
-                "codigo", Integer.class, "preco", BigDecimal.class, "estoque", Integer.class));
+        var atributos =
+                Arrays.stream(Produto.class.getDeclaredFields())
+                        .collect(Collectors.toMap(Field::getName, Field::getType));
+        assertThat(atributos)
+                .isEqualTo(
+                        Map.of(
+                                "codigo",
+                                Integer.class,
+                                "preco",
+                                BigDecimal.class,
+                                "estoque",
+                                Integer.class));
     }
 }

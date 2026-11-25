@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Configuration;
 /** Composição Spring das dependências do módulo produto. */
 @Configuration(proxyBeanMethods = false)
 public class ProdutoConfig {
-    /** @return armazenamento volátil usado enquanto não houver adaptador de banco */
+    /**
+     * @return armazenamento volátil usado enquanto não houver adaptador de banco
+     */
     @Bean
     public ProdutoRepository produtoRepository() {
         return new ProdutoRepositoryEmMemoria();
@@ -18,6 +20,7 @@ public class ProdutoConfig {
 
     /**
      * Constrói o serviço sem anotações Spring na aplicação.
+     *
      * @param repository porta de armazenamento
      * @param validator validador Jakarta fornecido pelo Boot
      * @return serviço funcional

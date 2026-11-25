@@ -12,19 +12,38 @@ import tools.jackson.databind.type.LogicalType;
 public class JacksonConfig {
     /**
      * Impede arredondamento de decimais em inteiros e conversão de texto ou booleanos em números.
+     *
      * @return customização do JsonMapper fornecido pelo Boot
      */
     @Bean
     public JsonMapperBuilderCustomizer numerosEstritos() {
-        return builder -> builder
-                .withCoercionConfig(LogicalType.Integer, config -> config
-                        .setCoercion(CoercionInputShape.Float, CoercionAction.Fail)
-                        .setCoercion(CoercionInputShape.String, CoercionAction.Fail)
-                        .setCoercion(CoercionInputShape.EmptyString, CoercionAction.Fail)
-                        .setCoercion(CoercionInputShape.Boolean, CoercionAction.Fail))
-                .withCoercionConfig(LogicalType.Float, config -> config
-                        .setCoercion(CoercionInputShape.String, CoercionAction.Fail)
-                        .setCoercion(CoercionInputShape.EmptyString, CoercionAction.Fail)
-                        .setCoercion(CoercionInputShape.Boolean, CoercionAction.Fail));
+        return builder ->
+                builder.withCoercionConfig(
+                                LogicalType.Integer,
+                                config ->
+                                        config.setCoercion(
+                                                        CoercionInputShape.Float,
+                                                        CoercionAction.Fail)
+                                                .setCoercion(
+                                                        CoercionInputShape.String,
+                                                        CoercionAction.Fail)
+                                                .setCoercion(
+                                                        CoercionInputShape.EmptyString,
+                                                        CoercionAction.Fail)
+                                                .setCoercion(
+                                                        CoercionInputShape.Boolean,
+                                                        CoercionAction.Fail))
+                        .withCoercionConfig(
+                                LogicalType.Float,
+                                config ->
+                                        config.setCoercion(
+                                                        CoercionInputShape.String,
+                                                        CoercionAction.Fail)
+                                                .setCoercion(
+                                                        CoercionInputShape.EmptyString,
+                                                        CoercionAction.Fail)
+                                                .setCoercion(
+                                                        CoercionInputShape.Boolean,
+                                                        CoercionAction.Fail));
     }
 }

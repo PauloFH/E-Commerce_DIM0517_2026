@@ -1,5 +1,7 @@
 package br.ufrn.imd.ecommerce.produto.adaptador.api.mapper;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.CadastrarProdutoRequest;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.SomarEstoqueRequest;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.EstoqueDto;
@@ -8,8 +10,6 @@ import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ProdutoMapperTests {
     private final ProdutoMapper mapper = Mappers.getMapper(ProdutoMapper.class);

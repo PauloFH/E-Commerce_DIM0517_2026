@@ -10,6 +10,7 @@ public final class Produto {
 
     /**
      * Constrói um retrato do produto com valores previamente validados pela aplicação.
+     *
      * @param codigo identificador do produto
      * @param preco preço em reais
      * @param estoque quantidade em unidades
@@ -20,17 +21,23 @@ public final class Produto {
         this.estoque = estoque;
     }
 
-    /** @return identificador do produto */
+    /**
+     * @return identificador do produto
+     */
     public Integer getCodigo() {
         return codigo;
     }
 
-    /** @return preço em reais */
+    /**
+     * @return preço em reais
+     */
     public BigDecimal getPreco() {
         return preco;
     }
 
-    /** @return quantidade em unidades */
+    /**
+     * @return quantidade em unidades
+     */
     public Integer getEstoque() {
         return estoque;
     }

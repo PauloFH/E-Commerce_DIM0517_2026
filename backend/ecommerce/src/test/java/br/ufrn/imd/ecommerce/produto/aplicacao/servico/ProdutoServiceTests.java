@@ -1,5 +1,8 @@
 package br.ufrn.imd.ecommerce.produto.aplicacao.servico;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import br.ufrn.imd.ecommerce.produto.adaptador.memoria.ProdutoRepositoryEmMemoria;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.BuscarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.CadastrarProdutoDto;
@@ -18,8 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import static org.assertj.core.api.Assertions.*;
 
 class ProdutoServiceTests {
     private static ValidatorFactory factory;
@@ -55,16 +56,23 @@ class ProdutoServiceTests {
     @Test
     void criaSoComORepositorioEValidaMesmoAssim() {
         var semValidatorExplicito = new ProdutoService(new ProdutoRepositoryEmMemoria());
-        assertThatThrownBy(() -> semValidatorExplicito.cadastrar(new CadastrarProdutoDto(null, BigDecimal.ONE)))
+        assertThatThrownBy(() ->
+                        semValidatorExplicito.cadastrar(
+                                new CadastrarProdutoDto(null, BigDecimal.ONE)))
                 .isInstanceOf(ConstraintViolationException.class);
-        assertThat(semValidatorExplicito.cadastrar(new CadastrarProdutoDto(1, BigDecimal.ONE)).getEstoque()).isZero();
+        assertThat(
+                        semValidatorExplicito
+                                .cadastrar(new CadastrarProdutoDto(1, BigDecimal.ONE))
+                                .getEstoque())
+                .isZero();
     }
 
     @Test
     void duplicacaoNaoSobrescreveProduto() {
         service.cadastrar(new CadastrarProdutoDto(1, BigDecimal.ONE));
         assertThatThrownBy(() -> service.cadastrar(new CadastrarProdutoDto(1, BigDecimal.TEN)))
-                .isInstanceOf(ProdutoJaExisteException.class).hasMessage("produto.ja.existe");
+                .isInstanceOf(ProdutoJaExisteException.class)
+                .hasMessage("produto.ja.existe");
         assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque()).isZero();
     }
 
@@ -77,8 +85,10 @@ class ProdutoServiceTests {
         service.cadastrar(new CadastrarProdutoDto(1, BigDecimal.ONE));
         service.entrada(new SomarEstoqueDto(1, Integer.MAX_VALUE));
         assertThatThrownBy(() -> service.entrada(new SomarEstoqueDto(1, 1)))
-                .isInstanceOf(DadosInvalidosException.class).hasMessage("produto.estoque.limite.excedido");
-        assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque()).isEqualTo(Integer.MAX_VALUE);
+                .isInstanceOf(DadosInvalidosException.class)
+                .hasMessage("produto.estoque.limite.excedido");
+        assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque())
+                .isEqualTo(Integer.MAX_VALUE);
     }
 
     @ParameterizedTest
@@ -102,7 +112,8 @@ class ProdutoServiceTests {
             valor = new BigDecimal(preco);
         }
         var dados = new CadastrarProdutoDto(1, valor);
-        assertThatThrownBy(() -> service.cadastrar(dados)).isInstanceOf(ConstraintViolationException.class);
+        assertThatThrownBy(() -> service.cadastrar(dados))
+                .isInstanceOf(ConstraintViolationException.class);
         assertThatThrownBy(() -> service.consultar(new BuscarProdutoDto(1)))
                 .isInstanceOf(ProdutoNaoEncontradoException.class);
     }
@@ -117,8 +128,10 @@ class ProdutoServiceTests {
 
     @Test
     void rejeitaEntradasNulas() {
-        assertThatThrownBy(() -> service.consultar(null)).isInstanceOf(DadosInvalidosException.class);
-        assertThatThrownBy(() -> service.cadastrar(null)).isInstanceOf(DadosInvalidosException.class);
+        assertThatThrownBy(() -> service.consultar(null))
+                .isInstanceOf(DadosInvalidosException.class);
+        assertThatThrownBy(() -> service.cadastrar(null))
+                .isInstanceOf(DadosInvalidosException.class);
         assertThatThrownBy(() -> service.entrada(null)).isInstanceOf(DadosInvalidosException.class);
     }
 }

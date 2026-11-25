@@ -7,16 +7,15 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Armazenamento volátil com exclusão mútua entre todas as operações.
- * A atomicidade vale somente para esta instância; reiniciar o processo apaga os dados.
+ * Armazenamento volátil com exclusão mútua entre todas as operações. A atomicidade vale somente
+ * para esta instância; reiniciar o processo apaga os dados.
  */
 public final class ProdutoRepositoryEmMemoria implements ProdutoRepository {
     // HashMap basta: todo acesso passa pelo monitor desta instância (synchronized).
     private final Map<Integer, Produto> produtos = new HashMap<>();
 
     /** Cria um armazenamento vazio, sem dependências externas. */
-    public ProdutoRepositoryEmMemoria() {
-    }
+    public ProdutoRepositoryEmMemoria() {}
 
     /** {@inheritDoc} A consulta não observa baixas parcialmente aplicadas. */
     @Override
@@ -66,8 +65,12 @@ public final class ProdutoRepositoryEmMemoria implements ProdutoRepository {
 
         for (var item : quantidades.entrySet()) {
             Produto produto = produtos.get(item.getKey());
-            produtos.put(item.getKey(), new Produto(produto.getCodigo(), produto.getPreco(),
-                    produto.getEstoque() - item.getValue()));
+            produtos.put(
+                    item.getKey(),
+                    new Produto(
+                            produto.getCodigo(),
+                            produto.getPreco(),
+                            produto.getEstoque() - item.getValue()));
         }
 
         return true;
