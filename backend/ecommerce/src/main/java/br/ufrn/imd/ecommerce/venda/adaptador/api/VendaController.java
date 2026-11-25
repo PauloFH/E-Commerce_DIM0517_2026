@@ -4,7 +4,6 @@ import br.ufrn.imd.ecommerce.venda.adaptador.api.dto.requisicao.VendaRequest;
 import br.ufrn.imd.ecommerce.venda.adaptador.api.dto.resposta.VendaResponse;
 import br.ufrn.imd.ecommerce.venda.adaptador.api.mapper.VendaMapper;
 import br.ufrn.imd.ecommerce.venda.aplicacao.servico.VendaService;
-import br.ufrn.imd.ecommerce.venda.dominio.excecao.VendaInvalidaException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,10 +28,6 @@ public class VendaController implements VendaApi {
     /** {@inheritDoc} */
     @Override
     public ResponseEntity<VendaResponse> vender(VendaRequest request) {
-        if (request == null) {
-            throw new VendaInvalidaException("requisicao.dados.obrigatorios");
-        }
-
         var resultado = service.vender(mapper.paraItens(request.itens()));
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.paraResposta(resultado));
     }
