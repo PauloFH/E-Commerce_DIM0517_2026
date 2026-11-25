@@ -23,9 +23,20 @@ defineExpose({ focar: () => entrada.value?.focus() })
 </script>
 
 <template>
-  <form class="busca" role="search" novalidate @submit.prevent="buscar">
-    <div class="campo" :class="{ comErro: erro, contorno }">
-      <label :for="id" class="visually-hidden">{{ t('busca.rotulo') }}</label>
+  <form
+    class="busca"
+    role="search"
+    novalidate
+    @submit.prevent="buscar"
+  >
+    <div
+      class="campo"
+      :class="{ comErro: erro, contorno }"
+    >
+      <label
+        :for="id"
+        class="visually-hidden"
+      >{{ t('busca.rotulo') }}</label>
       <input
         :id="id"
         ref="entrada"
@@ -37,11 +48,25 @@ defineExpose({ focar: () => entrada.value?.focus() })
         :aria-invalid="erro ? 'true' : undefined"
         :aria-describedby="erro ? `${id}-erro` : undefined"
       >
-      <button type="submit" class="botao" :aria-label="t('busca.botao')">
-        <KIcon nome="busca" :tamanho="20" />
+      <button
+        type="submit"
+        class="botao"
+        :aria-label="t('busca.botao')"
+      >
+        <KIcon
+          nome="busca"
+          :tamanho="20"
+        />
       </button>
     </div>
-    <p v-if="erro" :id="`${id}-erro`" class="erro" role="alert">{{ t('busca.erro') }}</p>
+    <p
+      v-if="erro"
+      :id="`${id}-erro`"
+      class="erro"
+      role="alert"
+    >
+      {{ t('busca.erro') }}
+    </p>
   </form>
 </template>
 

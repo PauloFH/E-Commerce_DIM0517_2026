@@ -1,0 +1,38 @@
+#!/bin/sh
+# Ativar: git config core.hooksPath .githooks
+set -e
+raiz=$(git rev-parse --show-toplevel)
+cd "$raiz"
+
+staged() { git diff --cached --name-only --diff-filter=ACMR -- "$@"; }
+
+java=$(staged 'backend/ecommerce/*.java')
+front=$(staged 'frontend/*.ts' 'frontend/*.vue' 'frontend/*.js' 'frontend/*.mjs')
+
+printf '%s\n' "$java" "$front" | while IFS= read -r arquivo; do
+  if [ -n "$arquivo" ] && ! git diff --quiet -- "$arquivo"; then
+    echo "pre-commit: $arquivo tem alterações fora do stage; inclua ou guarde essas alterações antes de continuar" >&2
+    exit 1
+  fi
+done
+
+if [ -n "$java" ]; then
+  echo "pre-commit: Spotless nos arquivos Java do commit"
+  arquivos=$(printf '%s\n' "$java" | sed "s|^|$raiz/|" | paste -sd, -)
+  if ! (cd backend/ecommerce && ./mvnw -q spotless:apply -DspotlessFiles="$arquivos"); then
+    echo "pre-commit: corrija os erros acima (ex.: import com *) e tente de novo" >&2
+    exit 1
+  fi
+  printf '%s\n' "$java" | xargs git add
+fi
+
+if [ -n "$front" ]; then
+  echo "pre-commit: ESLint nos arquivos do front do commit"
+  relativos=$(printf '%s\n' "$front" | sed 's|^frontend/||')
+  if ! (cd frontend && printf '%s\n' "$relativos" | xargs ./node_modules/.bin/eslint --fix --max-warnings 0); then
+    printf '%s\n' "$front" | xargs git add
+    echo "pre-commit: o ESLint corrigiu o que dava; resolva os erros acima e tente de novo" >&2
+    exit 1
+  fi
+  printf '%s\n' "$front" | xargs git add
+fi

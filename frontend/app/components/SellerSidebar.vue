@@ -4,29 +4,51 @@ const { t } = useI18n()
 const itens = [
   { to: '/vendedor', icone: 'inicio', chave: 'visaoGeral' },
   { to: '/vendedor/produtos/novo', icone: 'mais', chave: 'novoProduto' },
-  { to: '/vendedor/estoque', icone: 'estoque', chave: 'gerenciarEstoque' }
+  { to: '/vendedor/estoque', icone: 'estoque', chave: 'gerenciarEstoque' },
 ] as const
 </script>
 
 <template>
-  <nav class="menu" :aria-label="t('vendedor.menu')">
+  <nav
+    class="menu"
+    :aria-label="t('vendedor.menu')"
+  >
     <div class="cabecalho">
-      <p class="heading-sm">{{ t('vendedor.titulo') }}</p>
-      <p class="caption legenda">{{ t('vendedor.legenda') }}</p>
+      <p class="heading-sm">
+        {{ t('vendedor.titulo') }}
+      </p>
+      <p class="caption legenda">
+        {{ t('vendedor.legenda') }}
+      </p>
     </div>
 
     <ul>
-      <li v-for="item in itens" :key="item.to">
-        <NuxtLink :to="item.to" class="item">
-          <KIcon :nome="item.icone" :tamanho="20" />
+      <li
+        v-for="item in itens"
+        :key="item.to"
+      >
+        <NuxtLink
+          :to="item.to"
+          class="item"
+        >
+          <KIcon
+            :nome="item.icone"
+            :tamanho="20"
+          />
           {{ t(`vendedor.${item.chave}`) }}
         </NuxtLink>
       </li>
     </ul>
 
     <hr>
-    <NuxtLink to="/" class="item">
-      <KIcon nome="loja" :tamanho="20" />
+    <NuxtLink
+      to="/"
+      class="item"
+    >
+      <KIcon
+        nome="loja"
+        :tamanho="20"
+      />
       {{ t('vendedor.voltarLoja') }}
     </NuxtLink>
   </nav>

@@ -19,8 +19,9 @@ public final class ProdutoService {
     private final Validator validator;
 
     /**
-     * Cria o serviço fora do Spring com o Validator padrão do Jakarta Validation,
-     * compartilhado por todas as instâncias criadas assim.
+     * Cria o serviço fora do Spring com o Validator padrão do Jakarta Validation, compartilhado por
+     * todas as instâncias criadas assim.
+     *
      * @param repository porta de armazenamento
      */
     public ProdutoService(ProdutoRepository repository) {
@@ -29,11 +30,13 @@ public final class ProdutoService {
 
     /** Uma única factory por processo, criada só no primeiro uso do construtor sem Validator. */
     private static final class ValidatorPadrao {
-        private static final Validator INSTANCIA = Validation.buildDefaultValidatorFactory().getValidator();
+        private static final Validator INSTANCIA =
+                Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     /**
      * Recebe as dependências usadas também em chamadas fora do Spring.
+     *
      * @param repository porta de armazenamento
      * @param validator executor das restrições declaradas nos DTOs
      */
@@ -44,6 +47,7 @@ public final class ProdutoService {
 
     /**
      * Consulta um produto validando o identificador antes do acesso ao armazenamento.
+     *
      * @param dados entrada da consulta
      * @return produto encontrado
      * @throws ConstraintViolationException se algum campo for inválido
@@ -52,12 +56,16 @@ public final class ProdutoService {
      */
     public Produto consultar(BuscarProdutoDto dados) {
         validar(dados);
-        return repository.buscar(dados.codigo()).orElseThrow(
-                () -> new ProdutoNaoEncontradoException("produto.nao.encontrado", dados.codigo()));
+        return repository
+                .buscar(dados.codigo())
+                .orElseThrow(() ->
+                        new ProdutoNaoEncontradoException(
+                                "produto.nao.encontrado", dados.codigo()));
     }
 
     /**
      * Cadastra um produto com estoque zero, sem substituir códigos existentes.
+     *
      * @param dados código e preço do produto
      * @return produto cadastrado com estoque zero
      * @throws ConstraintViolationException se algum campo for inválido
@@ -77,6 +85,7 @@ public final class ProdutoService {
 
     /**
      * Repõe estoque atomicamente; chamadas repetidas somam novamente a quantidade.
+     *
      * @param dados código e quantidade em unidades
      * @return estoque após a reposição
      * @throws ConstraintViolationException se algum campo for inválido
@@ -88,8 +97,12 @@ public final class ProdutoService {
         Integer estoque;
 
         try {
-            estoque = repository.somarEstoque(dados.codigo(), dados.quantidade()).orElseThrow(
-                    () -> new ProdutoNaoEncontradoException("produto.nao.encontrado", dados.codigo()));
+            estoque =
+                    repository
+                            .somarEstoque(dados.codigo(), dados.quantidade())
+                            .orElseThrow(() ->
+                                    new ProdutoNaoEncontradoException(
+                                            "produto.nao.encontrado", dados.codigo()));
         } catch (ArithmeticException exception) {
             throw new DadosInvalidosException("produto.estoque.limite.excedido", dados.codigo());
         }

@@ -37,7 +37,7 @@ export function normalizarErro(erro: unknown, mensagemRede: string, mensagemGene
   const problema: ProblemDetail = {
     status: typeof dados.status === 'number' ? dados.status : (e.status ?? e.statusCode ?? 0),
     title: texto(dados.title) ?? mensagemGenerica,
-    detail: texto(dados.detail) ?? mensagemGenerica
+    detail: texto(dados.detail) ?? mensagemGenerica,
   }
   const codigoErro = texto(dados.codigoErro)
   if (codigoErro) problema.codigoErro = codigoErro

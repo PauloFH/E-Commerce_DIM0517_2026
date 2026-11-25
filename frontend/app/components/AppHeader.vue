@@ -46,50 +46,109 @@ watch(() => route.fullPath, () => fecharMenu())
         <KIcon nome="menu" />
       </button>
 
-      <KLogo fundo="escuro" class="logo" />
+      <KLogo
+        fundo="escuro"
+        class="logo"
+      />
 
       <SearchBar class="busca" />
 
-      <button type="button" class="idioma" :aria-label="rotuloIdioma" @click="setLocale(outroIdioma)">
-        <KIcon nome="idioma" :tamanho="20" />
+      <button
+        type="button"
+        class="idioma"
+        :aria-label="rotuloIdioma"
+        @click="setLocale(outroIdioma)"
+      >
+        <KIcon
+          nome="idioma"
+          :tamanho="20"
+        />
         <span class="label">{{ t('idioma.sigla') }}</span>
       </button>
 
-      <NuxtLink to="/vendedor" class="painel">
-        <KIcon nome="loja" :tamanho="26" />
+      <NuxtLink
+        to="/vendedor"
+        class="painel"
+      >
+        <KIcon
+          nome="loja"
+          :tamanho="26"
+        />
         <span class="painel-texto">
           <span class="caption">{{ t('cabecalho.vendePergunta') }}</span>
           <span class="label">{{ t('cabecalho.painelVendedor') }}</span>
         </span>
       </NuxtLink>
 
-      <NuxtLink to="/carrinho" class="carrinho" :aria-label="rotuloCarrinho">
+      <NuxtLink
+        to="/carrinho"
+        class="carrinho"
+        :aria-label="rotuloCarrinho"
+      >
         <span class="carrinho-icone">
-          <KIcon nome="carrinho" :tamanho="26" />
-          <span class="contador" aria-hidden="true">{{ total }}</span>
+          <KIcon
+            nome="carrinho"
+            :tamanho="26"
+          />
+          <span
+            class="contador"
+            aria-hidden="true"
+          >{{ total }}</span>
         </span>
-        <span class="label carrinho-texto" aria-hidden="true">{{ t('nav.carrinho') }}</span>
+        <span
+          class="label carrinho-texto"
+          aria-hidden="true"
+        >{{ t('nav.carrinho') }}</span>
       </NuxtLink>
     </div>
 
-    <nav class="faixa-secundaria" :aria-label="t('nav.principal')">
+    <nav
+      class="faixa-secundaria"
+      :aria-label="t('nav.principal')"
+    >
       <NuxtLink to="/">{{ t('nav.inicio') }}</NuxtLink>
-      <NuxtLink to="/#vistos" aria-current-value="false">{{ t('nav.vistos') }}</NuxtLink>
+      <NuxtLink
+        to="/#vistos"
+        aria-current-value="false"
+      >{{ t('nav.vistos') }}</NuxtLink>
       <NuxtLink to="/carrinho">{{ t('nav.carrinho') }}</NuxtLink>
       <NuxtLink to="/vendedor">{{ t('nav.vender') }}</NuxtLink>
     </nav>
 
-    <div v-show="menuAberto" class="fundo-gaveta" @click.self="fecharMenu(true)">
-      <nav id="gaveta" class="gaveta" :aria-label="t('nav.menu')">
-        <button ref="botaoFechar" type="button" class="fechar" :aria-label="t('nav.fecharMenu')" @click="fecharMenu(true)">
+    <div
+      v-show="menuAberto"
+      class="fundo-gaveta"
+      @click.self="fecharMenu(true)"
+    >
+      <nav
+        id="gaveta"
+        class="gaveta"
+        :aria-label="t('nav.menu')"
+      >
+        <button
+          ref="botaoFechar"
+          type="button"
+          class="fechar"
+          :aria-label="t('nav.fecharMenu')"
+          @click="fecharMenu(true)"
+        >
           <KIcon nome="fechar" />
         </button>
         <NuxtLink to="/">{{ t('nav.inicio') }}</NuxtLink>
-        <NuxtLink to="/#vistos" aria-current-value="false">{{ t('nav.vistos') }}</NuxtLink>
+        <NuxtLink
+          to="/#vistos"
+          aria-current-value="false"
+        >{{ t('nav.vistos') }}</NuxtLink>
         <NuxtLink to="/carrinho">{{ t('nav.carrinho') }}</NuxtLink>
         <NuxtLink to="/vendedor">{{ t('cabecalho.painelVendedor') }}</NuxtLink>
-        <button type="button" @click="setLocale(outroIdioma)">
-          <KIcon nome="idioma" :tamanho="20" />
+        <button
+          type="button"
+          @click="setLocale(outroIdioma)"
+        >
+          <KIcon
+            nome="idioma"
+            :tamanho="20"
+          />
           {{ rotuloIdioma }}
         </button>
       </nav>

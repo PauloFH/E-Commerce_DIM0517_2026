@@ -4,17 +4,28 @@ const { t } = useI18n()
 const itens = [
   { icone: 'busca', chave: 'busca' },
   { icone: 'carrinho', chave: 'compra' },
-  { icone: 'loja', chave: 'venda' }
+  { icone: 'loja', chave: 'venda' },
 ] as const
 </script>
 
 <template>
   <ul class="faixa">
-    <li v-for="item in itens" :key="item.chave" class="item">
-      <KIcon :nome="item.icone" class="icone" />
+    <li
+      v-for="item in itens"
+      :key="item.chave"
+      class="item"
+    >
+      <KIcon
+        :nome="item.icone"
+        class="icone"
+      />
       <div>
-        <p class="body titulo">{{ t(`beneficios.${item.chave}.titulo`) }}</p>
-        <p class="caption legenda">{{ t(`beneficios.${item.chave}.legenda`) }}</p>
+        <p class="body titulo">
+          {{ t(`beneficios.${item.chave}.titulo`) }}
+        </p>
+        <p class="caption legenda">
+          {{ t(`beneficios.${item.chave}.legenda`) }}
+        </p>
       </div>
     </li>
   </ul>

@@ -8,7 +8,7 @@ const caminhos = {
   estoque: '<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>',
   mais: '<path d="M12 5v14M5 12h14"/>',
   inicio: '<path d="M4 11 12 4l8 7v9h-5v-6H9v6H4v-9Z"/>',
-  fechar: '<path d="M6 6l12 12M18 6 6 18"/>'
+  fechar: '<path d="M6 6l12 12M18 6 6 18"/>',
 }
 
 defineProps<{ nome: keyof typeof caminhos, tamanho?: number }>()

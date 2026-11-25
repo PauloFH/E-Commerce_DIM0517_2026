@@ -1,5 +1,7 @@
 package br.ufrn.imd.ecommerce;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import br.ufrn.imd.ecommerce.produto.adaptador.api.mapper.ProdutoMapper;
 import br.ufrn.imd.ecommerce.produto.aplicacao.porta.ProdutoRepository;
 import br.ufrn.imd.ecommerce.produto.aplicacao.servico.ProdutoService;
@@ -7,8 +9,6 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class EcommerceApplicationTests {

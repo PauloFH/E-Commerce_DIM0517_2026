@@ -3,7 +3,10 @@ defineProps<{ tipo: 'em-estoque' | 'ultimas' | 'esgotado' | 'novo' }>()
 </script>
 
 <template>
-  <span class="selo" :class="tipo"><slot /></span>
+  <span
+    class="selo"
+    :class="tipo"
+  ><slot /></span>
 </template>
 
 <style scoped>

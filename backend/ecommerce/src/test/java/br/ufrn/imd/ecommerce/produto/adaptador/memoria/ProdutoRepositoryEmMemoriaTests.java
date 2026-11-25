@@ -1,5 +1,8 @@
 package br.ufrn.imd.ecommerce.produto.adaptador.memoria;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -13,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-
-import static org.assertj.core.api.Assertions.*;
 
 class ProdutoRepositoryEmMemoriaTests {
     private ProdutoRepositoryEmMemoria repository;
@@ -34,7 +35,8 @@ class ProdutoRepositoryEmMemoriaTests {
         Produto anterior = repository.buscar(1).orElseThrow();
         assertThat(repository.somarEstoque(1, 5)).contains(105);
         assertThat(anterior.getEstoque()).isEqualTo(100);
-        assertThat(repository.buscar(1).orElseThrow().getPreco()).isEqualByComparingTo(BigDecimal.ONE);
+        assertThat(repository.buscar(1).orElseThrow().getPreco())
+                .isEqualByComparingTo(BigDecimal.ONE);
     }
 
     @Test
@@ -54,7 +56,8 @@ class ProdutoRepositoryEmMemoriaTests {
     @Test
     void estouroOuQuantidadeInvalidaNaoAlteramProdutos() {
         repository.inserir(new Produto(3, BigDecimal.ONE, Integer.MAX_VALUE));
-        assertThatThrownBy(() -> repository.somarEstoque(3, 1)).isInstanceOf(ArithmeticException.class);
+        assertThatThrownBy(() -> repository.somarEstoque(3, 1))
+                .isInstanceOf(ArithmeticException.class);
         assertThat(repository.buscar(3).orElseThrow().getEstoque()).isEqualTo(Integer.MAX_VALUE);
         assertThatThrownBy(() -> repository.baixarEstoque(Map.of(1, 1, 2, -1)))
                 .isInstanceOf(IllegalArgumentException.class);

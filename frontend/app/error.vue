@@ -15,8 +15,12 @@ const tipo = computed(() => {
 })
 const codigo = computed(() => {
   const bruto = route.path.split('/')[2] ?? ''
-  try { return decodeURIComponent(bruto).slice(0, 8) }
-  catch { return bruto.slice(0, 8) }
+  try {
+    return decodeURIComponent(bruto).slice(0, 8)
+  }
+  catch {
+    return bruto.slice(0, 8)
+  }
 })
 const titulo = computed(() => t(`erroPagina.titulo${tipo.value}`))
 const numero = computed(() => (tipo.value === 'Produto' ? codigo.value : String(props.error.statusCode)))
@@ -31,17 +35,39 @@ const voltar = () => clearError({ redirect: '/' })
   <NuxtLayout>
     <div class="erro">
       <div class="mensagem">
-        <p class="label rotulo">{{ t('erroPagina.rotulo', { status: error.statusCode }) }}</p>
-        <h1 class="titulo">{{ titulo }}</h1>
-        <p class="body texto">{{ t(`erroPagina.texto${tipo}`, { codigo }) }}</p>
+        <p class="label rotulo">
+          {{ t('erroPagina.rotulo', { status: error.statusCode }) }}
+        </p>
+        <h1 class="titulo">
+          {{ titulo }}
+        </h1>
+        <p class="body texto">
+          {{ t(`erroPagina.texto${tipo}`, { codigo }) }}
+        </p>
         <div class="acoes">
-          <SearchBar id="busca-erro-pagina" :placeholder="t('erroPagina.buscarOutro')" contorno class="busca" />
-          <KButton variante="primario" @click="voltar">{{ t('erroPagina.voltar') }}</KButton>
+          <SearchBar
+            id="busca-erro-pagina"
+            :placeholder="t('erroPagina.buscarOutro')"
+            contorno
+            class="busca"
+          />
+          <KButton
+            variante="primario"
+            @click="voltar"
+          >
+            {{ t('erroPagina.voltar') }}
+          </KButton>
         </div>
       </div>
-      <div class="arte" aria-hidden="true">
+      <div
+        class="arte"
+        aria-hidden="true"
+      >
         <span class="heading-sm">{{ tipo === 'Produto' ? t('produto.cod') : t('erroPagina.legenda') }}</span>
-        <span class="numero" :class="{ longo: numero.length > 4 }">{{ numero }}</span>
+        <span
+          class="numero"
+          :class="{ longo: numero.length > 4 }"
+        >{{ numero }}</span>
       </div>
     </div>
   </NuxtLayout>

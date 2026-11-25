@@ -19,49 +19,123 @@ const rotuloSelo = (estoque?: number) => {
     <KBreadcrumb
       :itens="[
         { texto: t('vendedor.titulo'), to: '/vendedor' },
-        { texto: t('painelProdutos.titulo') }
+        { texto: t('painelProdutos.titulo') },
       ]"
     />
 
     <div class="titulo-linha">
-      <h1 class="heading-lg">{{ t('painelProdutos.titulo') }}</h1>
+      <h1 class="heading-lg">
+        {{ t('painelProdutos.titulo') }}
+      </h1>
       <div class="acoes-topo">
-        <KButton variante="secundario" to="/vendedor/estoque">{{ t('vendedor.gerenciarEstoque') }}</KButton>
-        <KButton variante="primario" to="/vendedor/produtos/novo">{{ t('vendedor.novoProduto') }}</KButton>
+        <KButton
+          variante="secundario"
+          to="/vendedor/estoque"
+        >
+          {{ t('vendedor.gerenciarEstoque') }}
+        </KButton>
+        <KButton
+          variante="primario"
+          to="/vendedor/produtos/novo"
+        >
+          {{ t('vendedor.novoProduto') }}
+        </KButton>
       </div>
     </div>
 
-    <KAlert tipo="info">{{ t('painelProdutos.aviso') }}</KAlert>
+    <KAlert tipo="info">
+      {{ t('painelProdutos.aviso') }}
+    </KAlert>
 
     <div class="tabela-caixa">
       <table>
-        <caption class="visually-hidden">{{ t('painelProdutos.tabela') }}</caption>
+        <caption class="visually-hidden">
+          {{ t('painelProdutos.tabela') }}
+        </caption>
         <thead>
           <tr>
-            <th scope="col" class="label">{{ t('painelProdutos.codigo') }}</th>
-            <th scope="col" class="label">{{ t('painelProdutos.preco') }}</th>
-            <th scope="col" class="label">{{ t('painelProdutos.estoque') }}</th>
-            <th scope="col" class="label">{{ t('painelProdutos.situacao') }}</th>
-            <th scope="col" class="label">{{ t('painelProdutos.acoes') }}</th>
+            <th
+              scope="col"
+              class="label"
+            >
+              {{ t('painelProdutos.codigo') }}
+            </th>
+            <th
+              scope="col"
+              class="label"
+            >
+              {{ t('painelProdutos.preco') }}
+            </th>
+            <th
+              scope="col"
+              class="label"
+            >
+              {{ t('painelProdutos.estoque') }}
+            </th>
+            <th
+              scope="col"
+              class="label"
+            >
+              {{ t('painelProdutos.situacao') }}
+            </th>
+            <th
+              scope="col"
+              class="label"
+            >
+              {{ t('painelProdutos.acoes') }}
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="!produtos.length">
-            <td colspan="5" class="vazio body">{{ t('painelProdutos.vazio') }}</td>
+            <td
+              colspan="5"
+              class="vazio body"
+            >
+              {{ t('painelProdutos.vazio') }}
+            </td>
           </tr>
-          <tr v-for="p in produtos" :key="p.codigo">
-            <th scope="row" class="body">{{ p.codigo }}</th>
-            <td class="body numero">{{ p.preco !== undefined ? formatarPreco(p.preco, locale) : t('painelProdutos.desconhecido') }}</td>
-            <td class="body numero">{{ p.estoque ?? t('painelProdutos.desconhecido') }}</td>
+          <tr
+            v-for="p in produtos"
+            :key="p.codigo"
+          >
+            <th
+              scope="row"
+              class="body"
+            >
+              {{ p.codigo }}
+            </th>
+            <td class="body numero">
+              {{ p.preco !== undefined ? formatarPreco(p.preco, locale) : t('painelProdutos.desconhecido') }}
+            </td>
+            <td class="body numero">
+              {{ p.estoque ?? t('painelProdutos.desconhecido') }}
+            </td>
             <td>
-              <KBadge v-if="seloEstoque(p.estoque)" :tipo="seloEstoque(p.estoque)!">{{ rotuloSelo(p.estoque) }}</KBadge>
-              <span v-else class="caption">{{ t('painelProdutos.situacaoDesconhecida') }}</span>
+              <KBadge
+                v-if="seloEstoque(p.estoque)"
+                :tipo="seloEstoque(p.estoque)!"
+              >
+                {{ rotuloSelo(p.estoque) }}
+              </KBadge>
+              <span
+                v-else
+                class="caption"
+              >{{ t('painelProdutos.situacaoDesconhecida') }}</span>
             </td>
             <td class="acoes">
-              <KButton variante="texto" :to="`/vendedor/estoque?codigo=${p.codigo}`" :aria-label="t('painelProdutos.reporProduto', { codigo: p.codigo })">
+              <KButton
+                variante="texto"
+                :to="`/vendedor/estoque?codigo=${p.codigo}`"
+                :aria-label="t('painelProdutos.reporProduto', { codigo: p.codigo })"
+              >
                 {{ t('painelProdutos.repor') }}
               </KButton>
-              <KButton variante="texto" :to="`/vendedor/estoque?codigo=${p.codigo}`" :aria-label="t('painelProdutos.baixaProduto', { codigo: p.codigo })">
+              <KButton
+                variante="texto"
+                :to="`/vendedor/estoque?codigo=${p.codigo}`"
+                :aria-label="t('painelProdutos.baixaProduto', { codigo: p.codigo })"
+              >
                 {{ t('painelProdutos.baixa') }}
               </KButton>
             </td>

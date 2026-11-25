@@ -10,11 +10,15 @@ useHead({ title: () => `${t('paginas.estoque.titulo')} · kompraki` })
     <KBreadcrumb
       :itens="[
         { texto: t('vendedor.titulo'), to: '/vendedor' },
-        { texto: t('paginas.estoque.titulo') }
+        { texto: t('paginas.estoque.titulo') },
       ]"
     />
-    <h1 class="heading-lg">{{ t('paginas.estoque.titulo') }}</h1>
-    <p class="body">{{ t('paginas.estoque.texto') }}</p>
+    <h1 class="heading-lg">
+      {{ t('paginas.estoque.titulo') }}
+    </h1>
+    <p class="body">
+      {{ t('paginas.estoque.texto') }}
+    </p>
   </div>
 </template>
 

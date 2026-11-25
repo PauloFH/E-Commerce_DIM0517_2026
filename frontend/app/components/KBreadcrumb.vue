@@ -4,12 +4,28 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <nav :aria-label="t('geral.voce')" class="caption trilha">
+  <nav
+    :aria-label="t('geral.voce')"
+    class="caption trilha"
+  >
     <ol>
-      <li v-for="(item, i) in itens" :key="i">
-        <NuxtLink v-if="item.to" :to="item.to">{{ item.texto }}</NuxtLink>
-        <span v-else aria-current="page">{{ item.texto }}</span>
-        <span v-if="i < itens.length - 1" class="separador" aria-hidden="true">›</span>
+      <li
+        v-for="(item, i) in itens"
+        :key="i"
+      >
+        <NuxtLink
+          v-if="item.to"
+          :to="item.to"
+        >{{ item.texto }}</NuxtLink>
+        <span
+          v-else
+          aria-current="page"
+        >{{ item.texto }}</span>
+        <span
+          v-if="i < itens.length - 1"
+          class="separador"
+          aria-hidden="true"
+        >›</span>
       </li>
     </ol>
   </nav>

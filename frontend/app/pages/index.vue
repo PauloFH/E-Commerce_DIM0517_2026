@@ -11,37 +11,99 @@ useHead({ title: () => `${t('inicio.seo')} · kompraki` })
       <h1 class="titulo">
         {{ t('inicio.titulo1') }}<br>{{ t('inicio.titulo2') }}
       </h1>
-      <p class="texto">{{ t('inicio.texto') }}</p>
-      <KButton variante="comprar" class="cta" @click="focarBusca">{{ t('inicio.buscar') }}</KButton>
+      <p class="texto">
+        {{ t('inicio.texto') }}
+      </p>
+      <KButton
+        variante="comprar"
+        class="cta"
+        @click="focarBusca"
+      >
+        {{ t('inicio.buscar') }}
+      </KButton>
 
-      <svg class="grafismo" viewBox="0 0 64 64" fill="none" aria-hidden="true" focusable="false">
-        <path d="M32 3C17.6 3 7 13.8 7 27.6 7 45.2 32 61 32 61s25-15.8 25-33.4C57 13.8 46.4 3 32 3Z" fill="#C6F432" />
-        <path d="M25 15v24M39.5 16 26.5 29M30 26.5l10.5 12.5" stroke="#2541B2" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
+      <svg
+        class="grafismo"
+        viewBox="0 0 64 64"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M32 3C17.6 3 7 13.8 7 27.6 7 45.2 32 61 32 61s25-15.8 25-33.4C57 13.8 46.4 3 32 3Z"
+          fill="#C6F432"
+        />
+        <path
+          d="M25 15v24M39.5 16 26.5 29M30 26.5l10.5 12.5"
+          stroke="#2541B2"
+          stroke-width="5.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
       </svg>
     </section>
 
     <BenefitsStrip />
 
-    <section id="vistos" aria-labelledby="vistos-titulo">
+    <section
+      id="vistos"
+      aria-labelledby="vistos-titulo"
+    >
       <div class="cabecalho-secao">
         <div>
-          <h2 id="vistos-titulo" class="heading-md">{{ t('inicio.vistosTitulo') }}</h2>
-          <p class="caption legenda">{{ t('inicio.vistosLegenda') }}</p>
+          <h2
+            id="vistos-titulo"
+            class="heading-md"
+          >
+            {{ t('inicio.vistosTitulo') }}
+          </h2>
+          <p class="caption legenda">
+            {{ t('inicio.vistosLegenda') }}
+          </p>
         </div>
-        <NuxtLink v-if="produtos.length" to="/vendedor" class="label ver-todos">{{ t('inicio.verTodos') }}</NuxtLink>
+        <NuxtLink
+          v-if="produtos.length"
+          to="/vendedor"
+          class="label ver-todos"
+        >{{ t('inicio.verTodos') }}</NuxtLink>
       </div>
 
-      <ul v-if="produtos.length" class="grade">
-        <li v-for="p in produtos" :key="p.codigo">
-          <ProductCard :codigo="p.codigo" :preco="p.preco" :estoque="p.estoque" />
+      <ul
+        v-if="produtos.length"
+        class="grade"
+      >
+        <li
+          v-for="p in produtos"
+          :key="p.codigo"
+        >
+          <ProductCard
+            :codigo="p.codigo"
+            :preco="p.preco"
+            :estoque="p.estoque"
+          />
         </li>
       </ul>
 
-      <div v-else class="vazio">
-        <span class="vazio-icone"><KIcon nome="estoque" :tamanho="32" /></span>
-        <h3 class="heading-sm">{{ t('inicio.vazioTitulo') }}</h3>
-        <p class="body">{{ t('inicio.vazioTexto') }}</p>
-        <KButton variante="primario" @click="focarBusca">{{ t('inicio.vazioBotao') }}</KButton>
+      <div
+        v-else
+        class="vazio"
+      >
+        <span class="vazio-icone"><KIcon
+          nome="estoque"
+          :tamanho="32"
+        /></span>
+        <h3 class="heading-sm">
+          {{ t('inicio.vazioTitulo') }}
+        </h3>
+        <p class="body">
+          {{ t('inicio.vazioTexto') }}
+        </p>
+        <KButton
+          variante="primario"
+          @click="focarBusca"
+        >
+          {{ t('inicio.vazioBotao') }}
+        </KButton>
       </div>
     </section>
   </div>

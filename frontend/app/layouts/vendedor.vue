@@ -4,11 +4,17 @@ const { t } = useI18n()
 
 <template>
   <div>
-    <a href="#conteudo" class="visually-hidden pular">{{ t('geral.pularConteudo') }}</a>
+    <a
+      href="#conteudo"
+      class="visually-hidden pular"
+    >{{ t('geral.pularConteudo') }}</a>
     <AppHeader />
     <div class="container area">
       <SellerSidebar />
-      <main id="conteudo" class="principal">
+      <main
+        id="conteudo"
+        class="principal"
+      >
         <slot />
       </main>
     </div>
@@ -25,7 +31,6 @@ const { t } = useI18n()
 }
 
 .principal { flex: 1; min-width: 0; }
-
 
 @media (max-width: 767px) {
   .area { flex-direction: column; align-items: stretch; }

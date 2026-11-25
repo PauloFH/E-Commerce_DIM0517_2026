@@ -20,6 +20,7 @@ public class ProdutoController implements ProdutoApi {
 
     /**
      * Recebe dependências do adaptador.
+     *
      * @param service casos de uso
      * @param mapper conversor de transporte
      */
@@ -39,7 +40,8 @@ public class ProdutoController implements ProdutoApi {
     /** {@inheritDoc} */
     @Override
     public ResponseEntity<EstoqueDto> consultar(Integer codigo) {
-        return ResponseEntity.ok(mapper.paraEstoque(service.consultar(new BuscarProdutoDto(codigo))));
+        return ResponseEntity.ok(
+                mapper.paraEstoque(service.consultar(new BuscarProdutoDto(codigo))));
     }
 
     /** {@inheritDoc} */

@@ -9,6 +9,6 @@ export function useProdutosConhecidos() {
     produtos: computed(() => listar(mapa.value)),
     registrar: (parcial: { codigo: number, preco?: number, estoque?: number }) => {
       mapa.value = registrar(mapa.value, parcial)
-    }
+    },
   }
 }

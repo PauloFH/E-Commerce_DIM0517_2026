@@ -6,8 +6,12 @@ useHead({ title: () => `${t('paginas.carrinho.titulo')} · kompraki` })
 <template>
   <div class="pagina">
     <KBreadcrumb :itens="[{ texto: t('nav.inicio'), to: '/' }, { texto: t('paginas.carrinho.titulo') }]" />
-    <h1 class="heading-lg">{{ t('paginas.carrinho.titulo') }}</h1>
-    <p class="body">{{ t('paginas.carrinho.texto') }}</p>
+    <h1 class="heading-lg">
+      {{ t('paginas.carrinho.titulo') }}
+    </h1>
+    <p class="body">
+      {{ t('paginas.carrinho.texto') }}
+    </p>
   </div>
 </template>
 

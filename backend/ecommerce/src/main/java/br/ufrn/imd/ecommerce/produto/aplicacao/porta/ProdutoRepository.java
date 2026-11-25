@@ -5,13 +5,14 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Porta de armazenamento. Cada operação deve ser atômica para todos os seus itens.
- * Recebe códigos positivos, produtos válidos e quantidades positivas, sem valores nulos.
- * Adaptadores de banco devem preservar estas garantias entre instâncias da aplicação.
+ * Porta de armazenamento. Cada operação deve ser atômica para todos os seus itens. Recebe códigos
+ * positivos, produtos válidos e quantidades positivas, sem valores nulos. Adaptadores de banco
+ * devem preservar estas garantias entre instâncias da aplicação.
  */
 public interface ProdutoRepository {
     /**
      * Consulta um retrato imutável do produto.
+     *
      * @param codigo identificador
      * @return produto ou vazio se ausente
      */
@@ -19,6 +20,7 @@ public interface ProdutoRepository {
 
     /**
      * Insere sem sobrescrever um produto existente.
+     *
      * @param produto produto a armazenar
      * @return verdadeiro se inserido; falso se o código já existe
      */
@@ -26,6 +28,7 @@ public interface ProdutoRepository {
 
     /**
      * Acrescenta unidades atomicamente, sem alteração em caso de estouro.
+     *
      * @param codigo identificador
      * @param quantidade unidades positivas a acrescentar
      * @return novo estoque ou vazio se o produto não existe
@@ -35,6 +38,7 @@ public interface ProdutoRepository {
 
     /**
      * Baixa todos os itens ou nenhum; mapa vazio é uma operação bem-sucedida.
+     *
      * @param quantidadesPorCodigo unidades positivas por código, sem valores nulos
      * @return falso se algum produto não existe ou não tem estoque suficiente
      */

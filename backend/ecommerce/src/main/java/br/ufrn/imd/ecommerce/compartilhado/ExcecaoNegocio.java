@@ -20,6 +20,7 @@ public abstract class ExcecaoNegocio extends RuntimeException {
 
     /**
      * Registra a categoria e a mensagem sem traduzir ou escolher um status HTTP.
+     *
      * @param tipo categoria do erro de negócio
      * @param chave chave da mensagem
      * @param argumentos valores usados na apresentação da mensagem
@@ -31,17 +32,23 @@ public abstract class ExcecaoNegocio extends RuntimeException {
         this.argumentos = List.of(argumentos);
     }
 
-    /** @return categoria do erro de negócio */
+    /**
+     * @return categoria do erro de negócio
+     */
     public Tipo getTipo() {
         return tipo;
     }
 
-    /** @return chave da mensagem */
+    /**
+     * @return chave da mensagem
+     */
     public String getChave() {
         return chave;
     }
 
-    /** @return argumentos imutáveis da mensagem */
+    /**
+     * @return argumentos imutáveis da mensagem
+     */
     public List<Object> getArgumentos() {
         return argumentos;
     }

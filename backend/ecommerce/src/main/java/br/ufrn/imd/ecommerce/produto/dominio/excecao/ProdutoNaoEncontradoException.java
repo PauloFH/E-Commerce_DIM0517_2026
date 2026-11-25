@@ -6,6 +6,7 @@ import br.ufrn.imd.ecommerce.compartilhado.ExcecaoNegocio;
 public final class ProdutoNaoEncontradoException extends ExcecaoNegocio {
     /**
      * Registra uma mensagem sem tradução ou informação de transporte.
+     *
      * @param chave chave da mensagem
      * @param argumentos valores usados na apresentação da mensagem
      */

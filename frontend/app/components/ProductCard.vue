@@ -22,12 +22,21 @@ function adicionarAoCarrinho() {
 
     <div class="corpo">
       <h3 class="body titulo">
-        <NuxtLink :to="`/produto/${codigo}`" class="link">{{ t('produto.titulo', { codigo }) }}</NuxtLink>
+        <NuxtLink
+          :to="`/produto/${codigo}`"
+          class="link"
+        >{{ t('produto.titulo', { codigo }) }}</NuxtLink>
       </h3>
 
       <div class="linha">
-        <span v-if="preco !== undefined" class="heading-md">{{ formatarPreco(preco, locale) }}</span>
-        <span v-else class="caption sem-preco">{{ t('produto.precoFechamento') }}</span>
+        <span
+          v-if="preco !== undefined"
+          class="heading-md"
+        >{{ formatarPreco(preco, locale) }}</span>
+        <span
+          v-else
+          class="caption sem-preco"
+        >{{ t('produto.precoFechamento') }}</span>
 
         <button
           v-if="estoque !== 0"
@@ -40,13 +49,25 @@ function adicionarAoCarrinho() {
         </button>
       </div>
 
-      <KBadge v-if="selo" :tipo="selo">
-        <template v-if="selo === 'em-estoque'">{{ t('selo.emEstoque') }}</template>
-        <template v-else-if="selo === 'ultimas'">{{ t('selo.ultimas', estoque!) }}</template>
-        <template v-else>{{ t('selo.esgotado') }}</template>
+      <KBadge
+        v-if="selo"
+        :tipo="selo"
+      >
+        <template v-if="selo === 'em-estoque'">
+          {{ t('selo.emEstoque') }}
+        </template>
+        <template v-else-if="selo === 'ultimas'">
+          {{ t('selo.ultimas', estoque!) }}
+        </template>
+        <template v-else>
+          {{ t('selo.esgotado') }}
+        </template>
       </KBadge>
 
-      <span class="visually-hidden" role="status">{{ adicionado ? t('produto.adicionado', { codigo }) : '' }}</span>
+      <span
+        class="visually-hidden"
+        role="status"
+      >{{ adicionado ? t('produto.adicionado', { codigo }) : '' }}</span>
     </div>
   </article>
 </template>

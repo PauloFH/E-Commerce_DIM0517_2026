@@ -15,6 +15,7 @@ import org.mapstruct.ReportingPolicy;
 public interface ProdutoMapper {
     /**
      * Converte o corpo HTTP sem alterar seus valores.
+     *
      * @param request corpo do cadastro
      * @return entrada do caso de uso
      */
@@ -22,6 +23,7 @@ public interface ProdutoMapper {
 
     /**
      * Combina código da rota e quantidade do corpo.
+     *
      * @param codigo identificador da rota
      * @param request corpo da reposição
      * @return entrada do caso de uso
@@ -30,6 +32,7 @@ public interface ProdutoMapper {
 
     /**
      * Converte o produto em representação de transporte.
+     *
      * @param produto produto encontrado
      * @return resposta HTTP
      */
@@ -37,6 +40,7 @@ public interface ProdutoMapper {
 
     /**
      * Expõe somente código e estoque na consulta.
+     *
      * @param produto produto encontrado
      * @return resposta sem preço
      */
