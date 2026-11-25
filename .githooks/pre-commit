@@ -7,6 +7,15 @@ cd "$raiz"
 staged() { git diff --cached --name-only --diff-filter=ACMR -- "$@"; }
 
 java=$(staged 'backend/ecommerce/*.java')
+front=$(staged 'frontend/*.ts' 'frontend/*.vue' 'frontend/*.js' 'frontend/*.mjs')
+
+printf '%s\n' "$java" "$front" | while IFS= read -r arquivo; do
+  if [ -n "$arquivo" ] && ! git diff --quiet -- "$arquivo"; then
+    echo "pre-commit: $arquivo tem alterações fora do stage; inclua ou guarde essas alterações antes de continuar" >&2
+    exit 1
+  fi
+done
+
 if [ -n "$java" ]; then
   echo "pre-commit: Spotless nos arquivos Java do commit"
   arquivos=$(printf '%s\n' "$java" | sed "s|^|$raiz/|" | paste -sd, -)
@@ -17,7 +26,6 @@ if [ -n "$java" ]; then
   printf '%s\n' "$java" | xargs git add
 fi
 
-front=$(staged 'frontend/*.ts' 'frontend/*.vue' 'frontend/*.js' 'frontend/*.mjs')
 if [ -n "$front" ]; then
   echo "pre-commit: ESLint nos arquivos do front do commit"
   relativos=$(printf '%s\n' "$front" | sed 's|^frontend/||')
