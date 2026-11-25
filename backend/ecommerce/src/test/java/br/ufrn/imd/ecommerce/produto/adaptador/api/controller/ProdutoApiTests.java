@@ -85,6 +85,15 @@ class ProdutoApiTests {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = {"\"59.90\"", "\"abc\"", "true", "\"\""})
+    void rejeitaCoercaoDoPreco(String valor) throws Exception {
+        mvc.perform(post("/loja/produto").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"codigo\":" + CODIGOS.incrementAndGet() + ",\"preco\":" + valor + "}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("requisicao.json.invalido"));
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"", "null", "{", "[]"})
     void rejeitaCorpoAusenteNuloOuMalformado(String corpo) throws Exception {
         mvc.perform(post("/loja/produto").contentType(MediaType.APPLICATION_JSON).content(corpo))
