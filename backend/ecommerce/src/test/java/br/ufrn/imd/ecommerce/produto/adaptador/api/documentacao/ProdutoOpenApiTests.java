@@ -21,10 +21,10 @@ class ProdutoOpenApiTests {
     @Autowired private MockMvc mvc;
 
     @Test
-    void interfacePublicaAsTresOperacoesComSchemasERespostas() throws Exception {
+    void interfacePublicaAsQuatroOperacoesComSchemasERespostas() throws Exception {
         mvc.perform(get("/v3/api-docs"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.paths.*.*", hasSize(3)))
+                .andExpect(jsonPath("$.paths.*.*", hasSize(4)))
                 .andExpect(
                         jsonPath("$.paths['/loja/produto'].post.summary")
                                 .value("Cadastrar produto"))
@@ -65,6 +65,20 @@ class ProdutoOpenApiTests {
                         jsonPath("$.paths['/loja/produto/{codigo}/entrada'].put.responses['404']")
                                 .exists())
                 .andExpect(
+                        jsonPath(
+                                "$.paths['/loja/produto/{codigo}/saida'].put.description",
+                                containsString("não idempotente")))
+                .andExpect(
+                        jsonPath(
+                                        "$.paths['/loja/produto/{codigo}/saida'].put.responses['200'].content['application/json'].schema['$ref']")
+                                .value("#/components/schemas/EstoqueDto"))
+                .andExpect(
+                        jsonPath("$.paths['/loja/produto/{codigo}/saida'].put.responses['400']")
+                                .exists())
+                .andExpect(
+                        jsonPath("$.paths['/loja/produto/{codigo}/saida'].put.responses['404']")
+                                .exists())
+                .andExpect(
                         jsonPath("$.components.schemas.ProdutoDto.properties.codigo.type")
                                 .value("integer"))
                 .andExpect(
@@ -91,6 +105,10 @@ class ProdutoOpenApiTests {
                 .andExpect(
                         jsonPath(
                                 "$.paths['/loja/produto/{codigo}/entrada'].put.requestBody.content['application/json'].schema.required",
+                                contains("quantidade")))
+                .andExpect(
+                        jsonPath(
+                                "$.paths['/loja/produto/{codigo}/saida'].put.requestBody.content['application/json'].schema.required",
                                 contains("quantidade")));
     }
 

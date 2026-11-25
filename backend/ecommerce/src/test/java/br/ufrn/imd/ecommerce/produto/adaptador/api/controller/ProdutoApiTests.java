@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -98,6 +99,9 @@ class ProdutoApiTests {
                                 .content("{\"quantidade\":" + valor + "}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("requisicao.json.invalido"));
+        saida(1, "{\"quantidade\":" + valor + "}")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("requisicao.json.invalido"));
     }
 
     @ParameterizedTest
@@ -132,6 +136,9 @@ class ProdutoApiTests {
                                 .content(corpo))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
+        saida(1, corpo)
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
     }
 
     @ParameterizedTest
@@ -164,6 +171,9 @@ class ProdutoApiTests {
                                 .content(corpo))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("requisicao.dados.invalidos"));
+        saida(1, corpo)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("requisicao.dados.invalidos"));
     }
 
     @Test
@@ -193,6 +203,67 @@ class ProdutoApiTests {
                 .andExpect(jsonPath("$.detail").value("produto.estoque.limite.excedido"));
         mvc.perform(get("/loja/produto/{codigo}/estoque", codigo))
                 .andExpect(jsonPath("$.estoque").value(Integer.MAX_VALUE));
+    }
+
+    @Test
+    void saidaSubtraiDoEstoqueComContratoHttp() throws Exception {
+        int codigo = CODIGOS.incrementAndGet();
+        cadastrar(codigo, 15);
+        saida(codigo, "{\"quantidade\":10}")
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.codigo").value(codigo))
+                .andExpect(jsonPath("$.estoque").value(5))
+                .andExpect(jsonPath("$.*", hasSize(2)));
+        mvc.perform(get("/loja/produto/{codigo}/estoque", codigo))
+                .andExpect(jsonPath("$.estoque").value(5));
+    }
+
+    @Test
+    void saidaQueZeraOEstoqueRetorna200() throws Exception {
+        int codigo = CODIGOS.incrementAndGet();
+        cadastrar(codigo, 15);
+        saida(codigo, "{\"quantidade\":15}")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.codigo").value(codigo))
+                .andExpect(jsonPath("$.estoque").value(0));
+        mvc.perform(get("/loja/produto/{codigo}/estoque", codigo))
+                .andExpect(jsonPath("$.estoque").value(0));
+    }
+
+    @Test
+    void saidaMaiorQueOEstoqueRetorna400SemAlteracao() throws Exception {
+        int codigo = CODIGOS.incrementAndGet();
+        cadastrar(codigo, 15);
+        saida(codigo, "{\"quantidade\":16}")
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value("produto.estoque.insuficiente"))
+                .andExpect(jsonPath("$.argumentos[0]").value(15));
+        mvc.perform(get("/loja/produto/{codigo}/estoque", codigo))
+                .andExpect(jsonPath("$.estoque").value(15));
+    }
+
+    @Test
+    void saidaDeProdutoAusenteRetorna404() throws Exception {
+        saida(CODIGOS.incrementAndGet(), "{\"quantidade\":1}")
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value("produto.nao.encontrado"));
+    }
+
+    @Test
+    void saidaComCodigoInvalidoRetorna400() throws Exception {
+        saida(0, "{\"quantidade\":1}")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("requisicao.dados.invalidos"));
+    }
+
+    private ResultActions saida(int codigo, String corpo) throws Exception {
+        return mvc.perform(
+                put("/loja/produto/{codigo}/saida", codigo)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(corpo));
     }
 
     private void cadastrar(int codigo, int estoque) throws Exception {

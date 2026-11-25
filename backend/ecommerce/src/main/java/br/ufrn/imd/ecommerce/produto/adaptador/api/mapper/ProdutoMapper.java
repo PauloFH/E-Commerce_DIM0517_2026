@@ -25,7 +25,7 @@ public interface ProdutoMapper {
      * Combina código da rota e quantidade do corpo.
      *
      * @param codigo identificador da rota
-     * @param request corpo da movimentação
+     * @param request corpo da movimentação (entrada ou saída)
      * @return entrada do caso de uso
      */
     MovimentoEstoqueDto paraMovimento(Integer codigo, MovimentoEstoqueRequest request);
@@ -45,4 +45,13 @@ public interface ProdutoMapper {
      * @return resposta sem preço
      */
     EstoqueDto paraEstoque(Produto produto);
+
+    /**
+     * Expõe o estoque resultante de uma movimentação.
+     *
+     * @param codigo identificador da rota
+     * @param estoque unidades disponíveis após a operação
+     * @return resposta sem preço
+     */
+    EstoqueDto paraEstoque(Integer codigo, Integer estoque);
 }

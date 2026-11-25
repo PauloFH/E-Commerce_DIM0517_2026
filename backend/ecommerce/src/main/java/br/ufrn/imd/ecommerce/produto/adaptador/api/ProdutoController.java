@@ -49,7 +49,15 @@ public class ProdutoController implements ProdutoApi {
     public ResponseEntity<EstoqueDto> entrada(Integer codigo, MovimentoEstoqueRequest request) {
         exigirCorpo(request);
         Integer estoque = service.entrada(mapper.paraMovimento(codigo, request));
-        return ResponseEntity.ok(new EstoqueDto(codigo, estoque));
+        return ResponseEntity.ok(mapper.paraEstoque(codigo, estoque));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ResponseEntity<EstoqueDto> saida(Integer codigo, MovimentoEstoqueRequest request) {
+        exigirCorpo(request);
+        Integer estoque = service.saida(mapper.paraMovimento(codigo, request));
+        return ResponseEntity.ok(mapper.paraEstoque(codigo, estoque));
     }
 
     /** Impede conversões de um corpo nulo em DTOs com significado diferente. */
