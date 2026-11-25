@@ -42,7 +42,7 @@ Os comandos do dia a dia estão no `justfile` da raiz. O CI usa os mesmos comand
 | `just front` | Sobe o front em `http://localhost:3000` |
 | `just formatar` | Formata back e front (`formatar-back` e `formatar-front` fazem um lado só) |
 | `just verificar` | Roda o mesmo que o CI (`verificar-back` e `verificar-front` fazem um lado só) |
-| `just testar-back` / `just testar-front` | Só os testes |
+| `just testar` | Roda os testes do back e do front (`testar-back` e `testar-front` fazem um lado só) |
 
 ## Backend
 

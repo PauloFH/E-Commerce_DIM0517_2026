@@ -51,6 +51,9 @@ verificar-front:
     bun run test
     bun run build
 
+# testes do back e do front
+testar: testar-back testar-front
+
 # testes do back
 [working-directory: 'backend/ecommerce']
 testar-back:
