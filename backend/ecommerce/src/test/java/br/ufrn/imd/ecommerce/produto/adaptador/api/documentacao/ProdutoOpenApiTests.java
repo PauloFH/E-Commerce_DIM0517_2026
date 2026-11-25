@@ -46,7 +46,13 @@ class ProdutoOpenApiTests {
                 .andExpect(
                         jsonPath("$.components.schemas.Problema.properties.erros.items['$ref']")
                                 .value("#/components/schemas/ErroCampo"))
-                .andExpect(jsonPath("$.components.schemas.ErroCampo.properties.*", hasSize(2)))
+                .andExpect(
+                        jsonPath("$.components.schemas.Problema.properties.codigoErro.type")
+                                .value("string"))
+                .andExpect(jsonPath("$.components.schemas.ErroCampo.properties.*", hasSize(3)))
+                .andExpect(jsonPath("$.components.schemas.ErroCampo.properties.campo").exists())
+                .andExpect(jsonPath("$.components.schemas.ErroCampo.properties.chave").exists())
+                .andExpect(jsonPath("$.components.schemas.ErroCampo.properties.mensagem").exists())
                 .andExpect(
                         jsonPath(
                                         "$.paths['/loja/produto/{codigo}/estoque'].get.responses['200'].content['application/json']")
@@ -110,6 +116,23 @@ class ProdutoOpenApiTests {
                         jsonPath(
                                 "$.paths['/loja/produto/{codigo}/saida'].put.requestBody.content['application/json'].schema.required",
                                 contains("quantidade")));
+    }
+
+    @Test
+    void documentaIdiomaDasMensagensEmTodasAsOperacoes() throws Exception {
+        for (String operacao :
+                new String[] {
+                    "['/loja/produto'].post",
+                    "['/loja/produto/{codigo}/estoque'].get",
+                    "['/loja/produto/{codigo}/entrada'].put",
+                    "['/loja/produto/{codigo}/saida'].put"
+                }) {
+            String parametro = "$.paths" + operacao + ".parameters[?(@.name == 'Accept-Language')]";
+            mvc.perform(get("/v3/api-docs"))
+                    .andExpect(jsonPath(parametro + ".in", contains("header")))
+                    .andExpect(jsonPath(parametro + ".example", contains("en")))
+                    .andExpect(jsonPath(parametro + ".schema.type", contains("string")));
+        }
     }
 
     @Test
