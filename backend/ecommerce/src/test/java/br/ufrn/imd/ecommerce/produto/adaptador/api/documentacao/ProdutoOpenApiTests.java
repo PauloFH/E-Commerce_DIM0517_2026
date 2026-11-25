@@ -125,7 +125,8 @@ class ProdutoOpenApiTests {
                     "['/loja/produto'].post",
                     "['/loja/produto/{codigo}/estoque'].get",
                     "['/loja/produto/{codigo}/entrada'].put",
-                    "['/loja/produto/{codigo}/saida'].put"
+                    "['/loja/produto/{codigo}/saida'].put",
+                    "['/loja/venda'].post"
                 }) {
             String parametro = "$.paths" + operacao + ".parameters[?(@.name == 'Accept-Language')]";
             mvc.perform(get("/v3/api-docs"))

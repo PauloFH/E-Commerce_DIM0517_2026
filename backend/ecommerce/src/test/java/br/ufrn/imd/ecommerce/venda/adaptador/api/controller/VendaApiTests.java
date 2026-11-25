@@ -82,7 +82,7 @@ class VendaApiTests {
         int a = cadastrar("10", 5);
         vender(corpo(a, 3, a, 3))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("produto.estoque.insuficiente"))
+                .andExpect(jsonPath("$.codigoErro").value("produto.estoque.insuficiente"))
                 .andExpect(jsonPath("$.argumentos[0]").value(5))
                 .andExpect(jsonPath("$.argumentos[1]").value(a));
         assertThat(estoque(a)).isEqualTo(5);
@@ -94,9 +94,12 @@ class VendaApiTests {
         vender(json)
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
-                .andExpect(jsonPath("$.detail").value("requisicao.dados.invalidos"))
+                .andExpect(jsonPath("$.codigoErro").value("requisicao.dados.invalidos"))
                 .andExpect(jsonPath("$.erros[0].campo").value("itens"))
-                .andExpect(jsonPath("$.erros[0].chave").value("venda.itens.obrigatorios"));
+                .andExpect(jsonPath("$.erros[0].chave").value("venda.itens.obrigatorios"))
+                .andExpect(
+                        jsonPath("$.erros[0].mensagem")
+                                .value("Informe ao menos um item na venda."));
     }
 
     @ParameterizedTest
@@ -104,7 +107,7 @@ class VendaApiTests {
     void corpoIlegivelOuComTipoErradoRetorna400(String json) throws Exception {
         vender(json)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("requisicao.json.invalido"));
+                .andExpect(jsonPath("$.codigoErro").value("requisicao.json.invalido"));
     }
 
     @ParameterizedTest
@@ -131,7 +134,7 @@ class VendaApiTests {
                                 + "]}")
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
-                .andExpect(jsonPath("$.detail").value("requisicao.dados.invalidos"))
+                .andExpect(jsonPath("$.codigoErro").value("requisicao.dados.invalidos"))
                 .andExpect(jsonPath("$.erros[0].campo").value(startsWith("itens[1]")));
         assertThat(estoque(a)).isEqualTo(10);
     }
@@ -157,7 +160,7 @@ class VendaApiTests {
                                 + valor
                                 + ",\"quantidade\":1}]}")
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("requisicao.json.invalido"));
+                .andExpect(jsonPath("$.codigoErro").value("requisicao.json.invalido"));
         vender(
                         "{\"itens\":[{\"codigo\":"
                                 + a
@@ -167,7 +170,7 @@ class VendaApiTests {
                                 + valor
                                 + "}]}")
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("requisicao.json.invalido"));
+                .andExpect(jsonPath("$.codigoErro").value("requisicao.json.invalido"));
         assertThat(estoque(a)).isEqualTo(10);
     }
 
@@ -178,10 +181,20 @@ class VendaApiTests {
         vender(corpo(a, 3, b, 6))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
-                .andExpect(jsonPath("$.detail").value("produto.estoque.insuficiente"))
+                .andExpect(jsonPath("$.codigoErro").value("produto.estoque.insuficiente"))
                 .andExpect(jsonPath("$.argumentos[0]").value(5))
+                .andExpect(jsonPath("$.detail").value("Estoque insuficiente. Disponível: 5."))
                 .andExpect(jsonPath("$.argumentos[1]").value(b))
                 .andExpect(jsonPath("$.instance").value("/loja/venda"));
+        mvc.perform(
+                        post("/loja/venda")
+                                .header("Accept-Language", "en")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(corpo(a, 3, b, 6)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Bad Request"))
+                .andExpect(jsonPath("$.detail").value("Insufficient stock. Available: 5."))
+                .andExpect(jsonPath("$.codigoErro").value("produto.estoque.insuficiente"));
         assertThat(estoque(a)).isEqualTo(10);
         assertThat(estoque(b)).isEqualTo(5);
     }
@@ -191,7 +204,7 @@ class VendaApiTests {
         int a = cadastrar("10", 10);
         vender(corpo(a, Integer.MAX_VALUE, a, 1))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("venda.quantidade.limite.excedido"))
+                .andExpect(jsonPath("$.codigoErro").value("venda.quantidade.limite.excedido"))
                 .andExpect(jsonPath("$.argumentos[0]").value(a));
         assertThat(estoque(a)).isEqualTo(10);
     }
@@ -203,7 +216,9 @@ class VendaApiTests {
         vender(corpo(a, 4, inexistente, 1))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
-                .andExpect(jsonPath("$.detail").value("produto.nao.encontrado"))
+                .andExpect(jsonPath("$.codigoErro").value("produto.nao.encontrado"))
+                .andExpect(
+                        jsonPath("$.detail").value("Produto " + inexistente + " não encontrado."))
                 .andExpect(jsonPath("$.argumentos[0]").value(inexistente));
         assertThat(estoque(a)).isEqualTo(10);
     }
