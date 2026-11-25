@@ -1,5 +1,7 @@
 package br.ufrn.imd.ecommerce.produto.aplicacao.servico;
 
+import br.ufrn.imd.ecommerce.produto.BaixaDeEstoque;
+import br.ufrn.imd.ecommerce.produto.ItemBaixado;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.BuscarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.CadastrarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.MovimentoEstoqueDto;
@@ -12,11 +14,12 @@ import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
 /** Casos de uso de produto, independentes de Spring e do armazenamento concreto. */
-public final class ProdutoService {
+public final class ProdutoService implements BaixaDeEstoque {
     private final ProdutoRepository repository;
     private final Validator validator;
 
@@ -124,16 +127,64 @@ public final class ProdutoService {
     public Integer saida(MovimentoEstoqueDto dados) {
         validar(dados);
 
-        return switch (repository.baixarEstoque(Map.of(dados.codigo(), dados.quantidade()))) {
-            case ResultadoBaixa.Baixado baixado ->
-                    baixado.produtos().get(dados.codigo()).getEstoque();
+        return baixarItens(Map.of(dados.codigo(), dados.quantidade()))
+                .get(dados.codigo())
+                .estoque();
+    }
+
+    /**
+     * Baixa vários produtos de uma só vez, todos ou nenhum.
+     *
+     * @param quantidadesPorCodigo unidades positivas por código positivo, sem nulos
+     * @return preço e estoque resultante de cada código, na ordem do mapa recebido
+     * @throws ProdutoNaoEncontradoException se algum produto não existir
+     * @throws DadosInvalidosException se o mapa for nulo, vazio ou inválido, ou faltar estoque; os
+     *     argumentos do estoque insuficiente são o disponível e o código
+     */
+    @Override
+    public Map<Integer, ItemBaixado> baixarItens(Map<Integer, Integer> quantidadesPorCodigo) {
+        validarBaixa(quantidadesPorCodigo);
+
+        return switch (repository.baixarEstoque(quantidadesPorCodigo)) {
+            case ResultadoBaixa.Baixado baixado -> {
+                Map<Integer, ItemBaixado> itens = new LinkedHashMap<>();
+                baixado.produtos()
+                        .forEach((codigo, produto) ->
+                                itens.put(
+                                        codigo,
+                                        new ItemBaixado(produto.getPreco(), produto.getEstoque())));
+                yield itens;
+            }
             case ResultadoBaixa.ProdutoInexistente inexistente ->
                     throw new ProdutoNaoEncontradoException(
                             "produto.nao.encontrado", inexistente.codigo());
             case ResultadoBaixa.EstoqueInsuficiente insuficiente ->
                     throw new DadosInvalidosException(
-                            "produto.estoque.insuficiente", insuficiente.disponivel());
+                            "produto.estoque.insuficiente",
+                            insuficiente.disponivel(),
+                            insuficiente.codigo());
         };
+    }
+
+    /** Garante a pré-condição da porta antes de qualquer efeito no armazenamento. */
+    private void validarBaixa(Map<Integer, Integer> quantidadesPorCodigo) {
+        if (quantidadesPorCodigo == null || quantidadesPorCodigo.isEmpty()) {
+            throw new DadosInvalidosException("requisicao.dados.obrigatorios");
+        }
+
+        for (var item : quantidadesPorCodigo.entrySet()) {
+            if (item.getKey() == null || item.getValue() == null) {
+                throw new DadosInvalidosException("requisicao.dados.obrigatorios");
+            }
+
+            if (item.getKey() <= 0) {
+                throw new DadosInvalidosException("produto.codigo.positivo");
+            }
+
+            if (item.getValue() <= 0) {
+                throw new DadosInvalidosException("produto.quantidade.positiva");
+            }
+        }
     }
 
     /** Executa as restrições declarativas antes de qualquer efeito no armazenamento. */

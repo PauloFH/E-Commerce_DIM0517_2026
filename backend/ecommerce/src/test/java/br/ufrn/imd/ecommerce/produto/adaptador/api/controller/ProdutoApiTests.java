@@ -239,7 +239,8 @@ class ProdutoApiTests {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.detail").value("produto.estoque.insuficiente"))
-                .andExpect(jsonPath("$.argumentos[0]").value(15));
+                .andExpect(jsonPath("$.argumentos[0]").value(15))
+                .andExpect(jsonPath("$.argumentos[1]").value(codigo));
         mvc.perform(get("/loja/produto/{codigo}/estoque", codigo))
                 .andExpect(jsonPath("$.estoque").value(15));
     }
