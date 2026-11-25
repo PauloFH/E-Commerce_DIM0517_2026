@@ -32,7 +32,7 @@ class ArquiteturaTests {
         modules.verify();
         // contains, e não containsExactly: novos módulos não quebram o teste
         assertThat(modules.stream().map(module -> module.getIdentifier().toString()))
-                .contains("produto", "compartilhado");
+                .contains("produto", "venda", "compartilhado");
     }
 
     @Test
@@ -84,6 +84,22 @@ class ArquiteturaTests {
                 .resideInAnyPackage(
                         "..adaptador.memoria..", "..adaptador.postgres..", "..aplicacao.porta..")
                 .because("o controller só conversa com o service")
+                .check(CLASSES);
+    }
+
+    @Test
+    void vendaSoUsaAApiPublicaDeProduto() {
+        noClasses()
+                .that()
+                .resideInAPackage("..venda..")
+                .should()
+                .dependOnClassesThat()
+                .resideInAnyPackage(
+                        "..produto.aplicacao..",
+                        "..produto.dominio..",
+                        "..produto.adaptador..",
+                        "..produto.config..")
+                .because("outros módulos só enxergam o pacote raiz de produto")
                 .check(CLASSES);
     }
 
