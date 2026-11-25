@@ -159,6 +159,22 @@
         "naoExisteLinha": "O produto {codigo} não existe mais."
       }
     },
+    "pedido": {
+      "titulo": "Pedido confirmado",
+      "migalhaVazio": "Pedido",
+      "texto": "Recebemos o seu pedido. Confira o resumo abaixo.",
+      "tabela": "Itens do pedido",
+      "produto": "Produto",
+      "quantidade": "Quantidade",
+      "subtotal": "Subtotal",
+      "estoque": "Estoque restante",
+      "unidades": "{n} unidade | {n} unidades",
+      "total": "Total",
+      "continuar": "Continuar comprando",
+      "vazioTitulo": "Nenhum pedido recente",
+      "vazioTexto": "Quando você finalizar uma compra, o resumo aparece aqui.",
+      "vazioBotao": "Ir para a loja"
+    },
     "novoProduto": {
       "titulo": "Novo produto",
       "texto": "O produto começa com estoque 0. Depois, reponha o estoque na tela Estoque.",

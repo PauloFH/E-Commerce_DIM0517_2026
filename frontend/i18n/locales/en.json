@@ -159,6 +159,22 @@
         "naoExisteLinha": "Product {codigo} no longer exists."
       }
     },
+    "pedido": {
+      "titulo": "Order confirmed",
+      "migalhaVazio": "Order",
+      "texto": "We received your order. Check the summary below.",
+      "tabela": "Order items",
+      "produto": "Product",
+      "quantidade": "Quantity",
+      "subtotal": "Subtotal",
+      "estoque": "Remaining stock",
+      "unidades": "{n} unit | {n} units",
+      "total": "Total",
+      "continuar": "Keep shopping",
+      "vazioTitulo": "No recent order",
+      "vazioTexto": "When you complete a purchase, the summary shows up here.",
+      "vazioBotao": "Go to the store"
+    },
     "novoProduto": {
       "titulo": "New product",
       "texto": "The product starts with stock 0. Then restock it on the Stock page.",
