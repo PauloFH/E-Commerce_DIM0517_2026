@@ -35,14 +35,14 @@ produto/
     porta/          Contrato ProdutoRepository
     servico/        Casos de uso de produto
   adaptador/
-    api/            Interface Swagger, controller e tratamento de erros
+    api/            Interface Swagger e controller
       dto/
         requisicao/ Corpos HTTP de entrada
         resposta/   Representações HTTP de saída
       mapper/       Conversões MapStruct
     memoria/        Implementação volátil de ProdutoRepository
   config/           Composição dos beans Spring
-compartilhado/      Configuração Jackson e erros HTTP/Bean Validation
+compartilhado/      Exceção-base de negócio, Jackson e handler global
 ```
 
 O serviço não depende de Spring, HTTP ou armazenamento concreto. Recebe `ProdutoRepository` e `jakarta.validation.Validator` no construtor e executa validações também em chamadas diretas, sem contexto Spring. Para testes independentes, criar o Validator com `Validation.buildDefaultValidatorFactory()` e encerrar essa factory ao final.
@@ -72,6 +72,8 @@ curl -X PUT http://localhost:8080/loja/produto/123/entrada \
 ```
 
 Reposição não é idempotente: repetir a chamada soma novamente. O limite de estoque é `2147483647`; ultrapassá-lo retorna 400 sem alteração. Código duplicado retorna 409 sem sobrescrever; código ausente retorna 404.
+
+O `GlobalHttpExceptionHandler` centraliza os erros de todos os módulos. As exceções de domínio estendem `ExcecaoNegocio`, contrato público em Java puro de `compartilhado`, e o handler converte suas categorias em status HTTP sem acessar o interior de produto.
 
 Erros usam `application/problem+json`, com `type: about:blank`, `title`, `status`, `detail` (chave de mensagem) e `instance` (caminho da requisição). Exceções de negócio incluem `argumentos`; validações incluem `erros` com `campo` e `chave`, sem publicar valores rejeitados. A tradução das chaves fica para uma entrega futura.
 
