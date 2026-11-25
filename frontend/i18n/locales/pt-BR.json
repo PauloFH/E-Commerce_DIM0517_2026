@@ -120,7 +120,14 @@
   "paginas": {
     "produto": {
       "seo": "Produto {codigo}",
-      "texto": "Aqui você vai ver o estoque atual do produto e escolher quantas unidades levar para o carrinho."
+      "emEstoque": "Em estoque: {n} unidade | Em estoque: {n} unidades",
+      "precoConfirmado": "Preço confirmado no fechamento da compra",
+      "maximo": "Máximo: {n} unidade | Máximo: {n} unidades",
+      "indisponivel": "Indisponível no momento",
+      "adicionarCarrinho": "Adicionar ao carrinho",
+      "comprarAgora": "Comprar agora",
+      "adicionado": "Produto {codigo} adicionado ao carrinho.",
+      "verCarrinho": "Ver carrinho"
     },
     "carrinho": {
       "titulo": "Carrinho",
@@ -161,5 +168,10 @@
     "textoFalha": "Tivemos um problema para abrir esta página. Tente de novo em instantes ou volte para o início.",
     "buscarOutro": "Buscar outro código",
     "voltar": "Voltar para o início"
+  },
+  "quantidade": {
+    "rotulo": "Quantidade",
+    "diminuir": "Diminuir quantidade",
+    "aumentar": "Aumentar quantidade"
   }
 }
