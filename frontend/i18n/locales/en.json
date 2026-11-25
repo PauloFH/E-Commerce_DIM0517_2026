@@ -131,7 +131,33 @@
     },
     "carrinho": {
       "titulo": "Cart",
-      "texto": "Here you will review the chosen items, adjust quantities and complete the purchase at once."
+      "tituloQtd": "Cart ({n} product) | Cart ({n} products)",
+      "texto": "Review the items and adjust the quantities before checking out.",
+      "lista": "Cart items",
+      "codigo": "Code {codigo}",
+      "estimado": "{valor} estimated",
+      "quantidadeDe": "Quantity of Product {codigo}",
+      "remover": "Remove",
+      "removerProduto": "Remove Product {codigo}",
+      "vazioTitulo": "Your cart is empty",
+      "vazioTexto": "Search for a product by code and add it to the cart to get started.",
+      "vazioBotao": "See products",
+      "resumo": {
+        "titulo": "Order summary",
+        "unidades": "Units",
+        "total": "Estimated total",
+        "semPreco": "Does not include {n} item with no known price. | Does not include {n} items with no known price.",
+        "aviso": "The final amount is confirmed at checkout.",
+        "finalizar": "Check out",
+        "enviando": "Sending…",
+        "continuar": "Keep shopping"
+      },
+      "erros": {
+        "estoque": "Not enough stock for product {codigo}: {n} unit available. | Not enough stock for product {codigo}: {n} units available.",
+        "estoqueLinha": "Not enough stock: {n} unit available. | Not enough stock: {n} units available.",
+        "naoExiste": "Product {codigo} no longer exists. Remove it from the cart to continue.",
+        "naoExisteLinha": "Product {codigo} no longer exists."
+      }
     },
     "novoProduto": {
       "titulo": "New product",

@@ -9,6 +9,7 @@ const caminhos = {
   mais: '<path d="M12 5v14M5 12h14"/>',
   inicio: '<path d="M4 11 12 4l8 7v9h-5v-6H9v6H4v-9Z"/>',
   fechar: '<path d="M6 6l12 12M18 6 6 18"/>',
+  lixeira: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
 }
 
 defineProps<{ nome: keyof typeof caminhos, tamanho?: number }>()

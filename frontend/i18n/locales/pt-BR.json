@@ -131,7 +131,33 @@
     },
     "carrinho": {
       "titulo": "Carrinho",
-      "texto": "Aqui você vai revisar os itens escolhidos, ajustar as quantidades e fechar a compra de uma só vez."
+      "tituloQtd": "Carrinho ({n} produto) | Carrinho ({n} produtos)",
+      "texto": "Revise os itens e ajuste as quantidades antes de finalizar.",
+      "lista": "Itens do carrinho",
+      "codigo": "Código {codigo}",
+      "estimado": "{valor} estimado",
+      "quantidadeDe": "Quantidade do Produto {codigo}",
+      "remover": "Remover",
+      "removerProduto": "Remover Produto {codigo}",
+      "vazioTitulo": "Seu carrinho está vazio",
+      "vazioTexto": "Busque um produto pelo código e adicione ao carrinho para começar.",
+      "vazioBotao": "Ver produtos",
+      "resumo": {
+        "titulo": "Resumo do pedido",
+        "unidades": "Unidades",
+        "total": "Total estimado",
+        "semPreco": "Não inclui {n} item sem preço conhecido. | Não inclui {n} itens sem preço conhecido.",
+        "aviso": "O valor final é confirmado ao finalizar.",
+        "finalizar": "Finalizar compra",
+        "enviando": "Enviando…",
+        "continuar": "Continuar comprando"
+      },
+      "erros": {
+        "estoque": "Estoque insuficiente para o produto {codigo}: há {n} unidade. | Estoque insuficiente para o produto {codigo}: há {n} unidades.",
+        "estoqueLinha": "Estoque insuficiente: há {n} unidade. | Estoque insuficiente: há {n} unidades.",
+        "naoExiste": "O produto {codigo} não existe mais. Remova-o do carrinho para continuar.",
+        "naoExisteLinha": "O produto {codigo} não existe mais."
+      }
     },
     "novoProduto": {
       "titulo": "Novo produto",
