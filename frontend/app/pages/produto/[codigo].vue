@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import type { ProblemDetail } from '~/utils/api'
 
-// só aceita código inteiro positivo; qualquer outro valor cai no 404
-definePageMeta({ validate: route => /^[1-9]\d*$/.test(String(route.params.codigo)) })
+definePageMeta({
+  // cada código monta a página do zero: o estoque e o 404 nunca vêm do produto anterior
+  key: route => route.fullPath,
+  // inteiro positivo que cabe no Integer da API; qualquer outro valor cai no 404
+  validate: route => /^[1-9]\d*$/.test(String(route.params.codigo)) && Number(route.params.codigo) <= 2_147_483_647,
+})
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -37,11 +41,12 @@ const quantidade = ref(esgotado.value ? 0 : 1)
 const adicionado = ref(false)
 
 // o preço continua o que já era conhecido; aqui só se guarda o estoque visto
-if (import.meta.client) {
+// depois da hidratação, para a leitura do localStorage não apagar esta visita
+onNuxtReady(() => {
   watch([codigo, estoque], ([cod, est]) => {
     if (est !== undefined) registrar({ codigo: cod, estoque: est })
   }, { immediate: true })
-}
+})
 
 watch(estoque, (novo) => {
   quantidade.value = limitarQuantidade(quantidade.value, novo ? 1 : 0, novo ?? 0, novo ? 1 : 0)
