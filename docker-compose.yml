@@ -1,0 +1,42 @@
+# Credenciais e portas só de desenvolvimento; sobrescreva por variável de ambiente.
+services:
+  banco:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: kompraki
+      POSTGRES_USER: ${BANCO_USUARIO:-kompraki}
+      POSTGRES_PASSWORD: ${BANCO_SENHA:-kompraki}
+    ports:
+      - "${BANCO_PORTA:-5432}:5432"
+    volumes:
+      - dados-banco:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: ./backend/ecommerce
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://banco:5432/kompraki
+      SPRING_DATASOURCE_USERNAME: ${BANCO_USUARIO:-kompraki}
+      SPRING_DATASOURCE_PASSWORD: ${BANCO_SENHA:-kompraki}
+    ports:
+      - "${API_PORTA:-8080}:8080"
+    depends_on:
+      banco:
+        condition: service_healthy
+
+  front:
+    build: ./frontend
+    environment:
+      NUXT_API_BASE: http://api:8080
+    ports:
+      - "${FRONT_PORTA:-3000}:3000"
+    depends_on:
+      - api
+
+volumes:
+  dados-banco:
