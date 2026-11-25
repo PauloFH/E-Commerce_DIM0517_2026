@@ -1,0 +1,26 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# google-java-format no estilo AOSP
+[*.java]
+indent_size = 4
+# imports explícitos;
+ij_java_class_count_to_use_import_on_demand = 100
+ij_java_names_count_to_use_import_on_demand = 100
+
+[pom.xml]
+indent_style = tab
+
+[*.cmd]
+end_of_line = crlf
+
+# dois espaços no fim da linha são quebra de linha no Markdown
+[*.md]
+trim_trailing_whitespace = false
