@@ -150,7 +150,7 @@ Portas e credenciais, todas de desenvolvimento, podem ser trocadas por variávei
 | `BANCO_USUARIO` | `kompraki` | Usuário do banco |
 | `BANCO_SENHA` | `kompraki` | Senha do banco |
 
-Para rodar a API fora do Docker contra um banco local, suba só o banco com `docker compose up -d banco` e rode `SPRING_PROFILES_ACTIVE=postgres just api`. Venda, listagem, edição e exclusão não estão incluídas nesta entrega.
+Para rodar a API fora do Docker contra um banco local, suba só o banco com `docker compose up -d banco`, exporte `SPRING_DATASOURCE_USERNAME` e `SPRING_DATASOURCE_PASSWORD` com os valores de `BANCO_USUARIO` e `BANCO_SENHA` (os padrões estão no `docker-compose.yml`; o `application.properties` guarda só a URL local) e rode `SPRING_PROFILES_ACTIVE=postgres just api`. Venda, listagem, edição e exclusão não estão incluídas nesta entrega.
 
 ## Frontend
 
