@@ -120,7 +120,14 @@
   "paginas": {
     "produto": {
       "seo": "Product {codigo}",
-      "texto": "Here you will see the product's current stock and choose how many units to add to your cart."
+      "emEstoque": "In stock: {n} unit | In stock: {n} units",
+      "precoConfirmado": "Price confirmed at checkout",
+      "maximo": "Maximum: {n} unit | Maximum: {n} units",
+      "indisponivel": "Unavailable right now",
+      "adicionarCarrinho": "Add to cart",
+      "comprarAgora": "Buy now",
+      "adicionado": "Product {codigo} added to cart.",
+      "verCarrinho": "View cart"
     },
     "carrinho": {
       "titulo": "Cart",
@@ -146,5 +153,10 @@
     "textoFalha": "We had a problem opening this page. Try again in a moment or go back to the home page.",
     "buscarOutro": "Search another code",
     "voltar": "Back to home"
+  },
+  "quantidade": {
+    "rotulo": "Quantity",
+    "diminuir": "Decrease quantity",
+    "aumentar": "Increase quantity"
   }
 }
