@@ -3,10 +3,12 @@ package br.ufrn.imd.ecommerce;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.type;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import br.ufrn.imd.ecommerce.compartilhado.ExcecaoNegocio;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
+import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import java.lang.reflect.Field;
@@ -18,47 +20,59 @@ import org.junit.jupiter.api.Test;
 import org.springframework.modulith.core.ApplicationModules;
 
 class ArquiteturaTests {
+    private static final JavaClasses CLASSES =
+            new ClassFileImporter()
+                    .withImportOption(new ImportOption.DoNotIncludeTests())
+                    .importPackages("br.ufrn.imd.ecommerce");
+
     @Test
     void verificaFronteirasDosModulos() {
         var modules = ApplicationModules.of(EcommerceApplication.class);
         modules.verify();
+        // contains, e não containsExactly: novos módulos não quebram o teste
         assertThat(modules.stream().map(module -> module.getIdentifier().toString()))
-                .containsExactlyInAnyOrder("produto", "compartilhado");
+                .contains("produto", "compartilhado");
     }
 
     @Test
     void dominioEAplicacaoNaoDependemDosAdaptadores() {
-        var classes =
-                new ClassFileImporter()
-                        .withImportOption(new ImportOption.DoNotIncludeTests())
-                        .importPackages("br.ufrn.imd.ecommerce");
         var contratoNegocio =
                 type(ExcecaoNegocio.class)
                         .or(type(ExcecaoNegocio.Tipo.class))
                         .or(type(ExcecaoNegocio.Tipo[].class));
         classes()
                 .that()
-                .resideInAPackage("..produto.dominio..")
+                .resideInAPackage("..dominio..")
                 .should()
                 .onlyDependOnClassesThat(
-                        resideInAnyPackage("java..", "..produto.dominio..").or(contratoNegocio))
-                .check(classes);
+                        resideInAnyPackage("java..", "..dominio..").or(contratoNegocio))
+                .check(CLASSES);
         classes()
                 .that(contratoNegocio)
                 .should()
                 .onlyDependOnClassesThat(resideInAnyPackage("java..").or(contratoNegocio))
-                .check(classes);
+                .check(CLASSES);
         classes()
                 .that()
-                .resideInAPackage("..produto.aplicacao..")
+                .resideInAPackage("..aplicacao..")
                 .should()
                 .onlyDependOnClassesThat()
                 .resideInAnyPackage(
-                        "java..",
-                        "jakarta.validation..",
-                        "..produto.aplicacao..",
-                        "..produto.dominio..")
-                .check(classes);
+                        "java..", "jakarta.validation..", "..aplicacao..", "..dominio..")
+                .check(CLASSES);
+    }
+
+    @Test
+    void apiNaoAcessaPersistenciaNemRepositorio() {
+        noClasses()
+                .that()
+                .resideInAPackage("..adaptador.api..")
+                .should()
+                .dependOnClassesThat()
+                .resideInAnyPackage(
+                        "..adaptador.memoria..", "..adaptador.postgres..", "..aplicacao.porta..")
+                .because("o controller só conversa com o service")
+                .check(CLASSES);
     }
 
     @Test
