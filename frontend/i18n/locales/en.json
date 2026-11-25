@@ -128,7 +128,21 @@
     },
     "novoProduto": {
       "titulo": "New product",
-      "texto": "Here you will register a product by entering its code and price. Every new product starts with stock 0."
+      "texto": "The product starts with stock 0. Then restock it on the Stock page.",
+      "codigo": "Code",
+      "codigoExemplo": "E.g. 123",
+      "preco": "Price",
+      "cadastrar": "Create product",
+      "previa": "Store preview",
+      "previaTexto": "This is how the product shows up in the store.",
+      "sucesso": "Product {codigo} created with stock 0.",
+      "reporEstoque": "Restock",
+      "erros": {
+        "codigoObrigatorio": "Enter the product code.",
+        "codigoInvalido": "Use a whole number greater than zero.",
+        "codigoDuplicado": "A product with code {codigo} already exists.",
+        "precoObrigatorio": "Enter a price greater than zero."
+      }
     },
     "estoque": {
       "titulo": "Manage stock",
