@@ -284,12 +284,12 @@ class ProdutoApiTests {
         saida(codigo, "{\"quantidade\":16}")
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
-                .andExpect(jsonPath("$.detail").value("Estoque insuficiente: há 15 unidades."))
+                .andExpect(jsonPath("$.detail").value("Estoque insuficiente. Disponível: 15."))
                 .andExpect(jsonPath("$.codigoErro").value("produto.estoque.insuficiente"))
                 .andExpect(jsonPath("$.argumentos[0]").value(15));
         saida(codigo, "{\"quantidade\":16}", "en")
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.detail").value("Insufficient stock: 15 units available."))
+                .andExpect(jsonPath("$.detail").value("Insufficient stock. Available: 15."))
                 .andExpect(jsonPath("$.codigoErro").value("produto.estoque.insuficiente"));
         mvc.perform(get("/loja/produto/{codigo}/estoque", codigo))
                 .andExpect(jsonPath("$.estoque").value(15));
