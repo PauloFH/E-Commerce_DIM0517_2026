@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, main, 'release/**']
+  pull_request:
+    branches: [develop, main, 'release/**']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v5
+        with:
+          install_args: java just
+      - uses: actions/cache@v6
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('backend/ecommerce/pom.xml') }}
+          restore-keys: maven-
+      - run: just verificar-back
+      - name: Relatório de cobertura
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: cobertura-jacoco
+          path: backend/ecommerce/target/site/jacoco/
+          if-no-files-found: ignore
+      - name: Diagramas dos módulos
+        uses: actions/upload-artifact@v7
+        with:
+          name: diagramas-modulos
+          path: backend/ecommerce/target/spring-modulith-docs/
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v5
+        with:
+          install_args: node bun just
+      - run: just instalar --frozen-lockfile
+      - run: just verificar-front
