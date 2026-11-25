@@ -141,7 +141,7 @@ Reposição não é idempotente: repetir a chamada soma novamente. O limite de e
 
 O `GlobalHttpExceptionHandler` centraliza os erros de todos os módulos. As exceções de domínio estendem `ExcecaoNegocio`, contrato público em Java puro de `compartilhado`, e o handler converte suas categorias em status HTTP sem acessar o interior de produto.
 
-Erros usam `application/problem+json`, com `type: about:blank`, `title`, `status`, `detail` (chave de mensagem) e `instance` (caminho da requisição). Exceções de negócio incluem `argumentos`; validações incluem `erros` com `campo` e `chave`, sem publicar valores rejeitados. No OpenAPI esse formato aparece como o schema `Problema`. A tradução das chaves fica para uma entrega futura.
+Erros usam `application/problem+json`, com `type: about:blank`, `title`, `status`, `detail` e `instance` (caminho da requisição). `title` e `detail` vêm traduzidos; `codigoErro` traz a chave estável da mensagem (por exemplo `produto.nao.encontrado`), para o cliente reagir sem depender do texto. Exceções de negócio incluem `argumentos`; validações incluem `erros`, ordenado por campo e chave, com `campo`, `chave` e `mensagem` (traduzida), sem publicar valores rejeitados. No OpenAPI esse formato aparece como o schema `Problema`. O cabeçalho `Accept-Language` seleciona português brasileiro (`pt-BR`) ou inglês (`en`); sem idioma compatível, a API usa português brasileiro. As mensagens ficam em `messages.properties` e `messages_en.properties`, e um teste garante que toda chave usada no código existe nos dois arquivos.
 
 ## Armazenamento
 
