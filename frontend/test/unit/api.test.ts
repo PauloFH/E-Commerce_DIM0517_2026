@@ -19,6 +19,21 @@ describe('normalizarErro', () => {
     expect(normalizarErro(erro, 'rede', 'generico').erros).toEqual([{ campo: 'preco', chave: 'produto.preco.positivo' }])
   })
 
+  it('preserva os argumentos e a mensagem traduzida dos erros', () => {
+    const erro = { response: {}, status: 409, data: { status: 409, detail: 'Estoque insuficiente', codigoErro: 'produto.estoque.insuficiente', argumentos: [3, 456] } }
+    expect(normalizarErro(erro, 'rede', 'generico').argumentos).toEqual([3, 456])
+
+    const validacao = { response: {}, status: 400, data: { status: 400, erros: [{ campo: 'itens[1].quantidade', chave: 'venda.quantidade.positiva', mensagem: 'Quantidade inválida' }, { campo: 'itens[0].codigo', chave: 'venda.codigo.obrigatorio' }] } }
+    expect(normalizarErro(validacao, 'rede', 'generico').erros).toEqual([
+      { campo: 'itens[1].quantidade', chave: 'venda.quantidade.positiva', mensagem: 'Quantidade inválida' },
+      { campo: 'itens[0].codigo', chave: 'venda.codigo.obrigatorio' },
+    ])
+  })
+
+  it('ignora argumentos que não são lista', () => {
+    expect(normalizarErro({ response: {}, status: 409, data: { argumentos: 'x' } }, 'rede', 'generico').argumentos).toBeUndefined()
+  })
+
   it('erro de rede vira status 0', () => {
     expect(normalizarErro(new TypeError('Failed to fetch'), 'sem rede', 'generico'))
       .toEqual({ status: 0, title: 'sem rede', detail: 'sem rede' })

@@ -3,6 +3,7 @@ package br.ufrn.imd.ecommerce.produto.aplicacao.servico;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import br.ufrn.imd.ecommerce.produto.ItemBaixado;
 import br.ufrn.imd.ecommerce.produto.adaptador.memoria.ProdutoRepositoryEmMemoria;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.BuscarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.CadastrarProdutoDto;
@@ -15,7 +16,10 @@ import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -125,7 +129,7 @@ class ProdutoServiceTests {
                 .hasMessage("produto.estoque.insuficiente")
                 .satisfies(e ->
                         assertThat(((DadosInvalidosException) e).getArgumentos())
-                                .containsExactly(15));
+                                .containsExactly(15, 1));
         assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque()).isEqualTo(15);
     }
 
@@ -134,6 +138,117 @@ class ProdutoServiceTests {
         assertThatThrownBy(() -> service.saida(new MovimentoEstoqueDto(1, 1)))
                 .isInstanceOf(ProdutoNaoEncontradoException.class)
                 .hasMessage("produto.nao.encontrado");
+    }
+
+    @Test
+    void baixarItensBaixaTodosNaOrdemRecebida() {
+        cadastrarComEstoque(1, "59.90", 15);
+        cadastrarComEstoque(2, "69.90", 8);
+        var itens = service.baixarItens(mapa(2, 1, 1, 2));
+        assertThat(itens.keySet()).containsExactly(2, 1);
+        assertThat(itens.get(1)).isEqualTo(new ItemBaixado(new BigDecimal("59.90"), 13));
+        assertThat(itens.get(2)).isEqualTo(new ItemBaixado(new BigDecimal("69.90"), 7));
+        assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque()).isEqualTo(13);
+        assertThat(service.consultar(new BuscarProdutoDto(2)).getEstoque()).isEqualTo(7);
+    }
+
+    @Test
+    void baixarItensSemEstoqueNaoAlteraNenhumProduto() {
+        cadastrarComEstoque(1, "1", 15);
+        cadastrarComEstoque(2, "1", 8);
+        assertThatThrownBy(() -> service.baixarItens(mapa(1, 5, 2, 9)))
+                .isInstanceOf(DadosInvalidosException.class)
+                .hasMessage("produto.estoque.insuficiente")
+                .satisfies(e ->
+                        assertThat(((DadosInvalidosException) e).getArgumentos())
+                                .containsExactly(8, 2));
+        assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque()).isEqualTo(15);
+        assertThat(service.consultar(new BuscarProdutoDto(2)).getEstoque()).isEqualTo(8);
+    }
+
+    @Test
+    void baixarItensComProdutoInexistenteNaoAlteraNada() {
+        cadastrarComEstoque(1, "1", 15);
+        assertThatThrownBy(() -> service.baixarItens(mapa(1, 5, 2, 1)))
+                .isInstanceOf(ProdutoNaoEncontradoException.class)
+                .hasMessage("produto.nao.encontrado")
+                .satisfies(e ->
+                        assertThat(((ProdutoNaoEncontradoException) e).getArgumentos())
+                                .containsExactly(2));
+        assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque()).isEqualTo(15);
+    }
+
+    @Test
+    void baixarItensRejeitaMapaInvalidoSemAlterarNada() {
+        cadastrarComEstoque(1, "1", 15);
+        var chaveNula = new HashMap<Integer, Integer>();
+        chaveNula.put(null, 1);
+        var valorNulo = new HashMap<Integer, Integer>();
+        valorNulo.put(1, null);
+        assertThatThrownBy(() -> service.baixarItens(null))
+                .isInstanceOf(DadosInvalidosException.class)
+                .hasMessage("requisicao.dados.obrigatorios");
+        assertThatThrownBy(() -> service.baixarItens(Map.of()))
+                .isInstanceOf(DadosInvalidosException.class)
+                .hasMessage("requisicao.dados.obrigatorios");
+        assertThatThrownBy(() -> service.baixarItens(chaveNula))
+                .isInstanceOf(DadosInvalidosException.class)
+                .hasMessage("requisicao.dados.obrigatorios");
+        assertThatThrownBy(() -> service.baixarItens(valorNulo))
+                .isInstanceOf(DadosInvalidosException.class)
+                .hasMessage("requisicao.dados.obrigatorios");
+        assertThatThrownBy(() -> service.baixarItens(mapa(1, 1, 0, 1)))
+                .isInstanceOf(DadosInvalidosException.class)
+                .hasMessage("produto.codigo.positivo");
+        assertThatThrownBy(() -> service.baixarItens(mapa(1, 1, 2, 0)))
+                .isInstanceOf(DadosInvalidosException.class)
+                .hasMessage("produto.quantidade.positiva");
+        assertThatThrownBy(() -> service.baixarItens(mapa(1, -1)))
+                .isInstanceOf(DadosInvalidosException.class)
+                .hasMessage("produto.quantidade.positiva");
+        assertThat(service.consultar(new BuscarProdutoDto(1)).getEstoque()).isEqualTo(15);
+    }
+
+    @Test
+    @Timeout(15)
+    void baixasDeVariosItensConcorrentesNuncaDeixamEstoqueNegativo() throws Exception {
+        int inicial = 1000;
+        int threads = 16;
+        cadastrarComEstoque(1, "1", inicial);
+        cadastrarComEstoque(2, "1", inicial);
+        var largada = new CountDownLatch(1);
+        var sucessos = new AtomicInteger();
+        List<Callable<Void>> tarefas = new ArrayList<>();
+
+        for (int i = 0; i < threads; i++) {
+            tarefas.add(() -> {
+                largada.await();
+                for (int j = 0; j < 100; j++) {
+                    try {
+                        service.baixarItens(mapa(1, 3, 2, 1));
+                        sucessos.incrementAndGet();
+                    } catch (DadosInvalidosException esperada) {
+                        // estoque esgotado: a baixa inteira é recusada
+                    }
+                }
+                return null;
+            });
+        }
+
+        try (var executor = Executors.newFixedThreadPool(threads)) {
+            var resultados = tarefas.stream().map(executor::submit).toList();
+            largada.countDown();
+            for (var resultado : resultados) {
+                resultado.get(10, TimeUnit.SECONDS);
+            }
+        }
+
+        int primeiro = service.consultar(new BuscarProdutoDto(1)).getEstoque();
+        int segundo = service.consultar(new BuscarProdutoDto(2)).getEstoque();
+        assertThat(primeiro).isGreaterThanOrEqualTo(0);
+        assertThat(segundo).isGreaterThanOrEqualTo(0);
+        assertThat(sucessos.get() * 3 + primeiro).isEqualTo(inicial);
+        assertThat(sucessos.get() + segundo).isEqualTo(inicial);
     }
 
     @ParameterizedTest
@@ -236,5 +351,20 @@ class ProdutoServiceTests {
                 .isInstanceOf(DadosInvalidosException.class);
         assertThatThrownBy(() -> service.entrada(null)).isInstanceOf(DadosInvalidosException.class);
         assertThatThrownBy(() -> service.saida(null)).isInstanceOf(DadosInvalidosException.class);
+    }
+
+    private void cadastrarComEstoque(int codigo, String preco, int estoque) {
+        service.cadastrar(new CadastrarProdutoDto(codigo, new BigDecimal(preco)));
+        service.entrada(new MovimentoEstoqueDto(codigo, estoque));
+    }
+
+    private static Map<Integer, Integer> mapa(int... paresCodigoQuantidade) {
+        var resultado = new LinkedHashMap<Integer, Integer>();
+
+        for (int i = 0; i < paresCodigoQuantidade.length; i += 2) {
+            resultado.put(paresCodigoQuantidade[i], paresCodigoQuantidade[i + 1]);
+        }
+
+        return resultado;
     }
 }
