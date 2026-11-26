@@ -44,7 +44,7 @@ class MensagensTests {
         String handler =
                 Files.readString(
                         FONTES.resolve(
-                                "br/ufrn/imd/ecommerce/compartilhado/GlobalHttpExceptionHandler.java"),
+                                "br/ufrn/imd/ecommerce/compartilhado/api/GlobalHttpExceptionHandler.java"),
                         StandardCharsets.UTF_8);
         Set<String> titulos = new TreeSet<>();
         STATUS.matcher(handler)

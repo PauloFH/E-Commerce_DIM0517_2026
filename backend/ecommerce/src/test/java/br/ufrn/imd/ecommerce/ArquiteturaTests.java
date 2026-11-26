@@ -59,7 +59,7 @@ class ArquiteturaTests {
                 .should()
                 .onlyDependOnClassesThat(resideInAnyPackage("java..").or(contratoNegocio))
                 .check(CLASSES);
-        // o pacote raiz de produto é a API pública que outros módulos podem usar
+        // Os contratos públicos são expostos na raiz e em interfaces nomeadas.
         classes()
                 .that()
                 .resideInAPackage("..aplicacao..")
@@ -70,7 +70,8 @@ class ArquiteturaTests {
                         "jakarta.validation..",
                         "..aplicacao..",
                         "..dominio..",
-                        "br.ufrn.imd.ecommerce.produto")
+                        "br.ufrn.imd.ecommerce.produto",
+                        "br.ufrn.imd.ecommerce.produto.estoque")
                 .check(CLASSES);
     }
 
@@ -99,7 +100,7 @@ class ArquiteturaTests {
                         "..produto.dominio..",
                         "..produto.adaptador..",
                         "..produto.config..")
-                .because("outros módulos só enxergam o pacote raiz de produto")
+                .because("outros módulos só enxergam os contratos públicos de produto")
                 .check(CLASSES);
     }
 

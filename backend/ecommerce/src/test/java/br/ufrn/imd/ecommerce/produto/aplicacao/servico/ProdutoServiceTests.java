@@ -3,7 +3,6 @@ package br.ufrn.imd.ecommerce.produto.aplicacao.servico;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import br.ufrn.imd.ecommerce.produto.ItemBaixado;
 import br.ufrn.imd.ecommerce.produto.adaptador.memoria.ProdutoRepositoryEmMemoria;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.BuscarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.CadastrarProdutoDto;
@@ -11,6 +10,7 @@ import br.ufrn.imd.ecommerce.produto.aplicacao.dto.MovimentoEstoqueDto;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.DadosInvalidosException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoJaExisteException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoNaoEncontradoException;
+import br.ufrn.imd.ecommerce.produto.estoque.ItemBaixado;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;

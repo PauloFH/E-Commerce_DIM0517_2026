@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
-import br.ufrn.imd.ecommerce.produto.BaixaDeEstoque;
-import br.ufrn.imd.ecommerce.produto.ItemBaixado;
 import br.ufrn.imd.ecommerce.produto.adaptador.memoria.ProdutoRepositoryEmMemoria;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.BuscarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.CadastrarProdutoDto;
@@ -13,6 +11,8 @@ import br.ufrn.imd.ecommerce.produto.aplicacao.dto.MovimentoEstoqueDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.servico.ProdutoService;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.DadosInvalidosException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoNaoEncontradoException;
+import br.ufrn.imd.ecommerce.produto.estoque.BaixaDeEstoque;
+import br.ufrn.imd.ecommerce.produto.estoque.ItemBaixado;
 import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ItemVenda;
 import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ItemVendido;
 import br.ufrn.imd.ecommerce.venda.dominio.excecao.VendaInvalidaException;
