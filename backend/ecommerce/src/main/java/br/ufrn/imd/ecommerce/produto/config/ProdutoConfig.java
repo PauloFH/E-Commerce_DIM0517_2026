@@ -1,21 +1,35 @@
 package br.ufrn.imd.ecommerce.produto.config;
 
 import br.ufrn.imd.ecommerce.produto.adaptador.memoria.ProdutoRepositoryEmMemoria;
+import br.ufrn.imd.ecommerce.produto.adaptador.postgres.ProdutoRepositoryPostgres;
 import br.ufrn.imd.ecommerce.produto.aplicacao.porta.ProdutoRepository;
 import br.ufrn.imd.ecommerce.produto.aplicacao.servico.ProdutoService;
 import jakarta.validation.Validator;
+import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /** Composição Spring das dependências do módulo produto. */
 @Configuration(proxyBeanMethods = false)
 public class ProdutoConfig {
     /**
-     * @return armazenamento volátil usado enquanto não houver adaptador de banco
+     * @return armazenamento volátil, padrão quando o profile postgres não está ativo
      */
     @Bean
-    public ProdutoRepository produtoRepository() {
+    @Profile("!postgres")
+    public ProdutoRepository produtoRepositoryEmMemoria() {
         return new ProdutoRepositoryEmMemoria();
+    }
+
+    /**
+     * @param dataSource conexões com o banco migrado pelo Flyway
+     * @return armazenamento durável, ativo somente no profile postgres
+     */
+    @Bean
+    @Profile("postgres")
+    public ProdutoRepository produtoRepositoryPostgres(DataSource dataSource) {
+        return new ProdutoRepositoryPostgres(dataSource);
     }
 
     /**

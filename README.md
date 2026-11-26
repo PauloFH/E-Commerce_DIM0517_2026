@@ -19,6 +19,7 @@ Emanuel Kywal Pinto Cabral Filho e Paulo Roberto Fernandes Holanda
 | [Bun](https://bun.sh) | 1.4.5 | Dependências e scripts do front |
 | [just](https://just.systems) | 1.59 | Comandos do projeto |
 | `unzip` | qualquer | O `mvnw` confere o Maven baixado (Linux, macOS e WSL) |
+| [Docker](https://docs.docker.com/get-docker/) | com Compose v2 | `docker compose up` e os testes do adaptador PostgreSQL (Testcontainers) |
 
 Com o mise, depois de clonar:
 
@@ -79,6 +80,7 @@ produto/
         resposta/   Representações HTTP de saída
       mapper/       Conversões MapStruct
     memoria/        Implementação volátil de ProdutoRepository
+    postgres/       Implementação durável de ProdutoRepository (profile postgres)
   config/           Composição dos beans Spring
   BaixaDeEstoque    API pública do módulo, usada pela venda (sem Spring)
 venda/
@@ -147,9 +149,31 @@ Erros usam `application/problem+json`, com `type: about:blank`, `title`, `status
 
 `ProdutoRepository` define consulta, inserção sem sobrescrita, soma atômica e baixa em lote. A baixa retorna um `ResultadoBaixa`: `Baixado` com os produtos atualizados, `ProdutoInexistente` ou `EstoqueInsuficiente` (com o estoque disponível). Se algum código não existe, esse resultado prevalece sobre estoque insuficiente; em ambos nada é alterado. Mapa vazio retorna `Baixado` sem itens. A porta recebe produtos válidos, códigos positivos, quantidades positivas e nenhum valor nulo.
 
-O adaptador em memória usa um único monitor em todas as operações, inclusive leituras, impedindo observar uma baixa parcial. Atualizações substituem produtos imutáveis. Um futuro adaptador de banco deverá preservar os mesmos contratos e garantir atomicidade entre instâncias.
+Há dois adaptadores. O padrão é o **em memória**: usa um único monitor em todas as operações, inclusive leituras, impedindo observar uma baixa parcial, e substitui produtos imutáveis a cada atualização. Os dados são perdidos ao reiniciar e cada instância da API possui seu próprio estoque.
 
-**Os dados são perdidos ao reiniciar. Cada instância da API possui seu próprio estoque.** Persistência durável, listagem, edição e exclusão não estão incluídas nesta entrega.
+O adaptador **PostgreSQL** é ativado pelo profile `postgres` e guarda os dados de forma durável e compartilhada entre instâncias. A tabela `produto` (`codigo`, `preco`, `estoque`) é criada pelo Flyway (`src/main/resources/db/migration`) quando a API sobe, com `CHECK` para preço positivo e estoque não negativo. A consistência fica com o banco, sem lock na aplicação nem coluna de versão: a inserção usa `ON CONFLICT DO NOTHING`, a soma é um único `UPDATE ... RETURNING` (o estouro do `integer` vira `ArithmeticException`) e a baixa trava os produtos com `SELECT ... ORDER BY codigo FOR UPDATE` na mesma transação, o que evita deadlock entre baixas em ordem diferente, e só então decide o resultado na ordem do mapa recebido e atualiza. Em recusa nada é alterado.
+
+Sem o profile, a API sobe sem datasource e não abre conexão com banco. A mesma suíte de testes (`ProdutoRepositoryContrato`) roda contra os dois adaptadores; o do PostgreSQL usa Testcontainers (`postgres:18-alpine`) e por isso exige o Docker rodando.
+
+### Docker Compose
+
+```bash
+docker compose up --build
+```
+
+Sobe o PostgreSQL, a API com o profile `postgres` e o front. O front fica em `http://localhost:3000` e a API em `http://localhost:8080`; os dados ficam no volume `dados-banco` e sobrevivem a reiniciar a API (`docker compose restart api`) e a `docker compose down`. Para apagar também os dados, use `docker compose down -v`.
+
+Portas e credenciais, todas de desenvolvimento, podem ser trocadas por variáveis de ambiente:
+
+| Variável | Padrão | Uso |
+|---|---|---|
+| `API_PORTA` | `8080` | Porta da API no host |
+| `FRONT_PORTA` | `3000` | Porta do front no host |
+| `BANCO_PORTA` | `5432` | Porta do PostgreSQL no host |
+| `BANCO_USUARIO` | `kompraki` | Usuário do banco |
+| `BANCO_SENHA` | `kompraki` | Senha do banco |
+
+Para rodar a API fora do Docker contra um banco local, suba só o banco com `docker compose up -d banco`, exporte `SPRING_DATASOURCE_USERNAME` e `SPRING_DATASOURCE_PASSWORD` com os valores de `BANCO_USUARIO` e `BANCO_SENHA` (os padrões estão no `docker-compose.yml`; o `application.properties` guarda só a URL local) e rode `SPRING_PROFILES_ACTIVE=postgres just api`. Venda, listagem, edição e exclusão não estão incluídas nesta entrega.
 
 ## Frontend
 
