@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import br.ufrn.imd.ecommerce.produto.aplicacao.porta.ResultadoBaixa;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
+import com.zaxxer.hikari.HikariDataSource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -13,6 +14,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -23,14 +25,20 @@ class ProdutoRepositoryPostgresDuasInstanciasTests {
     private static final int ESTOQUE_INICIAL = 800;
     private static final int REPOSICOES = 4 * 50;
 
+    private final List<HikariDataSource> pools =
+            List.of(
+                    BancoDeTeste.novoDataSource(THREADS + 4),
+                    BancoDeTeste.novoDataSource(THREADS + 4));
+
+    @AfterEach
+    void fecharPools() {
+        pools.forEach(HikariDataSource::close);
+    }
+
     @Test
     @Timeout(60)
     void baixasEmInstanciasDiferentesNaoDeixamEstoqueNegativoNemPerdemAtualizacoes()
             throws Exception {
-        var pools =
-                List.of(
-                        BancoDeTeste.novoDataSource(THREADS + 4),
-                        BancoDeTeste.novoDataSource(THREADS + 4));
         BancoDeTeste.limpo();
         var instancias = pools.stream().map(ProdutoRepositoryPostgres::new).toList();
         instancias.getFirst().inserir(new Produto(1, BigDecimal.ONE, ESTOQUE_INICIAL));

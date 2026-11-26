@@ -34,7 +34,7 @@ final class BancoDeTeste {
     }
 
     /** Pool novo, para simular outra instância da API no mesmo banco. */
-    static DataSource novoDataSource(int conexoes) {
+    static HikariDataSource novoDataSource(int conexoes) {
         var dataSource = new HikariDataSource();
         dataSource.setJdbcUrl(url());
         dataSource.setUsername(usuario());
