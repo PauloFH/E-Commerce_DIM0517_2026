@@ -13,6 +13,7 @@ import br.ufrn.imd.ecommerce.produto.dominio.excecao.DadosInvalidosException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoNaoEncontradoException;
 import br.ufrn.imd.ecommerce.produto.estoque.BaixaDeEstoque;
 import br.ufrn.imd.ecommerce.produto.estoque.ItemBaixado;
+import br.ufrn.imd.ecommerce.venda.VendaRealizada;
 import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ItemVenda;
 import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ItemVendido;
 import br.ufrn.imd.ecommerce.venda.dominio.excecao.VendaInvalidaException;
@@ -40,6 +41,7 @@ class VendaServiceTests {
     private static ValidatorFactory factory;
     private ProdutoService produtos;
     private VendaService service;
+    private final List<Object> eventos = new ArrayList<>();
 
     @BeforeAll
     static void criarValidator() {
@@ -54,7 +56,21 @@ class VendaServiceTests {
     @BeforeEach
     void criarServicosSemSpring() {
         produtos = new ProdutoService(new ProdutoRepositoryEmMemoria(), factory.getValidator());
-        service = new VendaService(produtos, factory.getValidator());
+        service = new VendaService(produtos, factory.getValidator(), eventos::add);
+    }
+
+    @Test
+    void publicaApenasOVendidoComItensAgrupados() {
+        cadastrar(123, "2.50", 8);
+        service.vender(List.of(new ItemVenda(123, 2), new ItemVenda(123, 1)));
+
+        assertThatThrownBy(() -> service.vender(List.of(new ItemVenda(123, 6))))
+                .isInstanceOf(DadosInvalidosException.class);
+        assertThat(eventos)
+                .containsExactly(
+                        new VendaRealizada(
+                                new BigDecimal("7.50"),
+                                List.of(new VendaRealizada.Item(123, 3, 5))));
     }
 
     @Test
