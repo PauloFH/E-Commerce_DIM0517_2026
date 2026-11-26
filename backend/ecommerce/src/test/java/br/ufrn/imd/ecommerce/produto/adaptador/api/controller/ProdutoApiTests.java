@@ -286,7 +286,8 @@ class ProdutoApiTests {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.detail").value("Estoque insuficiente. Disponível: 15."))
                 .andExpect(jsonPath("$.codigoErro").value("produto.estoque.insuficiente"))
-                .andExpect(jsonPath("$.argumentos[0]").value(15));
+                .andExpect(jsonPath("$.argumentos[0]").value(15))
+                .andExpect(jsonPath("$.argumentos[1]").value(codigo));
         saida(codigo, "{\"quantidade\":16}", "en")
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail").value("Insufficient stock. Available: 15."))

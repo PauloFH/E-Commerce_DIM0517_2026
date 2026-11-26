@@ -2,12 +2,13 @@
 const props = withDefaults(defineProps<{
   variante?: 'comprar' | 'primario' | 'secundario' | 'texto'
   disabled?: boolean
+  carregando?: boolean
   to?: string
   type?: 'button' | 'submit' | 'reset'
 }>(), { variante: 'primario', to: undefined, type: 'button' })
 
 // link desabilitado não faz sentido: vira botão desabilitado
-const comoLink = computed(() => !!props.to && !props.disabled)
+const comoLink = computed(() => !!props.to && !props.disabled && !props.carregando)
 </script>
 
 <template>
@@ -24,8 +25,14 @@ const comoLink = computed(() => !!props.to && !props.disabled)
     :type="type"
     class="botao"
     :class="variante"
-    :disabled="disabled"
+    :disabled="disabled || carregando"
+    :aria-busy="carregando || undefined"
   >
+    <span
+      v-if="carregando"
+      class="giro"
+      aria-hidden="true"
+    />
     <slot />
   </button>
 </template>
@@ -64,5 +71,19 @@ const comoLink = computed(() => !!props.to && !props.disabled)
   border-color: transparent;
   color: var(--color-text-disabled);
   cursor: not-allowed;
+}
+.giro {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--radius-full);
+  animation: giro 0.8s linear infinite;
+}
+
+@keyframes giro { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .giro { animation-duration: 2.4s; }
 }
 </style>
