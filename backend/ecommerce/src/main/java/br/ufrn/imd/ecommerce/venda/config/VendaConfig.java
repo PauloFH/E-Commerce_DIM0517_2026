@@ -1,6 +1,6 @@
 package br.ufrn.imd.ecommerce.venda.config;
 
-import br.ufrn.imd.ecommerce.produto.BaixaDeEstoque;
+import br.ufrn.imd.ecommerce.produto.estoque.BaixaDeEstoque;
 import br.ufrn.imd.ecommerce.venda.aplicacao.servico.VendaService;
 import jakarta.validation.Validator;
 import org.springframework.context.annotation.Bean;

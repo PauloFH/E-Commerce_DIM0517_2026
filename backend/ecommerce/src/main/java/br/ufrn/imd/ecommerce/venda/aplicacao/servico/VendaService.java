@@ -1,7 +1,7 @@
 package br.ufrn.imd.ecommerce.venda.aplicacao.servico;
 
-import br.ufrn.imd.ecommerce.produto.BaixaDeEstoque;
-import br.ufrn.imd.ecommerce.produto.ItemBaixado;
+import br.ufrn.imd.ecommerce.produto.estoque.BaixaDeEstoque;
+import br.ufrn.imd.ecommerce.produto.estoque.ItemBaixado;
 import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ItemVenda;
 import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ItemVendido;
 import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ResultadoVenda;

@@ -1,4 +1,4 @@
-package br.ufrn.imd.ecommerce.compartilhado;
+package br.ufrn.imd.ecommerce.compartilhado.api;
 
 import java.net.URI;
 import java.util.List;

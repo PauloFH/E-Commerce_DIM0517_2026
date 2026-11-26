@@ -1,7 +1,5 @@
 package br.ufrn.imd.ecommerce.produto.aplicacao.servico;
 
-import br.ufrn.imd.ecommerce.produto.BaixaDeEstoque;
-import br.ufrn.imd.ecommerce.produto.ItemBaixado;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.BuscarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.CadastrarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.MovimentoEstoqueDto;
@@ -11,6 +9,8 @@ import br.ufrn.imd.ecommerce.produto.dominio.excecao.DadosInvalidosException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoJaExisteException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoNaoEncontradoException;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
+import br.ufrn.imd.ecommerce.produto.estoque.BaixaDeEstoque;
+import br.ufrn.imd.ecommerce.produto.estoque.ItemBaixado;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

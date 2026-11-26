@@ -1,6 +1,6 @@
 package br.ufrn.imd.ecommerce.venda.adaptador.api;
 
-import br.ufrn.imd.ecommerce.compartilhado.Problema;
+import br.ufrn.imd.ecommerce.compartilhado.api.Problema;
 import br.ufrn.imd.ecommerce.venda.adaptador.api.dto.requisicao.VendaRequest;
 import br.ufrn.imd.ecommerce.venda.adaptador.api.dto.resposta.VendaResponse;
 import io.swagger.v3.oas.annotations.Operation;

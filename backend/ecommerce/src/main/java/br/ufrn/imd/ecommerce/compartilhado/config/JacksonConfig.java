@@ -1,4 +1,4 @@
-package br.ufrn.imd.ecommerce.compartilhado;
+package br.ufrn.imd.ecommerce.compartilhado.config;
 
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
