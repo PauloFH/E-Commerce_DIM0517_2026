@@ -82,7 +82,8 @@ produto/
     memoria/        Implementação volátil de ProdutoRepository
     postgres/       Implementação durável de ProdutoRepository (profile postgres)
   config/           Composição dos beans Spring
-  BaixaDeEstoque    API pública do módulo, usada pela venda (sem Spring)
+  estoque/         BaixaDeEstoque e ItemBaixado, contratos públicos para venda
+  EstoqueEntrou e EstoqueSaiu  Eventos públicos de estoque
 venda/
   dominio/excecao/  Exceção de negócio da venda
   aplicacao/
@@ -90,7 +91,14 @@ venda/
     servico/        VendaService: valida, agrupa por código e baixa o estoque de uma vez
   adaptador/api/    Interface Swagger, controller, DTOs HTTP e mapper MapStruct
   config/           Composição dos beans Spring
-compartilhado/      Exceção-base de negócio, Jackson, handler global e schema de erro do OpenAPI
+auditoria/
+  AuditoriaListener  Consumidor dos eventos de estoque e venda
+  registro/        Modelo e armazenamento dos movimentos
+compartilhado/
+  api/             Handler global e schema de erro do OpenAPI
+  config/          Jackson, idioma e transações em memória
+  evento/          Porta de publicação e adaptador Spring
+  ExcecaoNegocio   Exceção-base de negócio
 ```
 
 O serviço não depende de Spring, HTTP ou armazenamento concreto. Recebe `ProdutoRepository` e `jakarta.validation.Validator` no construtor e executa validações também em chamadas diretas, sem contexto Spring. Fora do Spring, `new ProdutoService(new ProdutoRepositoryEmMemoria())` usa o Validator padrão do Jakarta Validation.
@@ -137,7 +145,7 @@ Com os produtos 123 (R$ 59,90, estoque 15) e 456 (R$ 69,90, estoque 8), a venda 
 {"total":189.70,"itens":[{"codigo":123,"quantidade":2,"subtotal":119.80,"estoque":13},{"codigo":456,"quantidade":1,"subtotal":69.90,"estoque":7}]}
 ```
 
-A venda baixa o estoque de cada item e calcula `subtotal = preço × quantidade` e `total = Σ subtotal`, em reais com duas casas (arredondamento `HALF_EVEN`). Ela é atômica: se qualquer item for inválido (lista ausente ou vazia, campo ausente, `"abc"`, `2.5`, quantidade ou código menor ou igual a zero), a quantidade passar do estoque (400, `produto.estoque.insuficiente`, com `argumentos` `[disponível, código]`) ou o produto não existir (404), nenhum estoque muda. Itens com o mesmo código têm as quantidades somadas e aparecem uma única vez na resposta, na ordem da primeira aparição, então o estoque nunca fica negativo. Erros de validação trazem `erros[].campo` com a linha, como `itens[1].quantidade`. A venda não é idempotente: repetir a chamada baixa o estoque novamente. O módulo `venda` usa somente `BaixaDeEstoque`, o pacote raiz público de `produto`; `ProdutoService` implementa essa interface e a baixa de todos os itens ocorre em uma única chamada ao repositório.
+A venda baixa o estoque de cada item e calcula `subtotal = preço × quantidade` e `total = Σ subtotal`, em reais com duas casas (arredondamento `HALF_EVEN`). Ela é atômica: se qualquer item for inválido (lista ausente ou vazia, campo ausente, `"abc"`, `2.5`, quantidade ou código menor ou igual a zero), a quantidade passar do estoque (400, `produto.estoque.insuficiente`, com `argumentos` `[disponível, código]`) ou o produto não existir (404), nenhum estoque muda. Itens com o mesmo código têm as quantidades somadas e aparecem uma única vez na resposta, na ordem da primeira aparição, então o estoque nunca fica negativo. Erros de validação trazem `erros[].campo` com a linha, como `itens[1].quantidade`. A venda não é idempotente: repetir a chamada baixa o estoque novamente. O módulo `venda` usa somente `BaixaDeEstoque`, contrato público de `produto.estoque`; `ProdutoService` implementa essa interface e a baixa de todos os itens ocorre em uma única chamada ao repositório.
 
 Reposição não é idempotente: repetir a chamada soma novamente. O limite de estoque é `2147483647`; ultrapassá-lo retorna 400 sem alteração. A saída também não é idempotente: repetir a chamada subtrai novamente. Quantidade maior que o estoque retorna 400 (`produto.estoque.insuficiente`) sem alteração, então o estoque nunca fica negativo; levar o estoque a zero é permitido. Código duplicado retorna 409 sem sobrescrever; código ausente retorna 404.
 
@@ -154,6 +162,14 @@ Há dois adaptadores. O padrão é o **em memória**: usa um único monitor em t
 O adaptador **PostgreSQL** é ativado pelo profile `postgres` e guarda os dados de forma durável e compartilhada entre instâncias. A tabela `produto` (`codigo`, `preco`, `estoque`) é criada pelo Flyway (`src/main/resources/db/migration`) quando a API sobe, com `CHECK` para preço positivo e estoque não negativo. A consistência fica com o banco, sem lock na aplicação nem coluna de versão: a inserção usa `ON CONFLICT DO NOTHING`, a soma é um único `UPDATE ... RETURNING` (o estouro do `integer` vira `ArithmeticException`) e a baixa trava os produtos com `SELECT ... ORDER BY codigo FOR UPDATE` na mesma transação, o que evita deadlock entre baixas em ordem diferente, e só então decide o resultado na ordem do mapa recebido e atualiza. Em recusa nada é alterado.
 
 Sem o profile, a API sobe sem datasource e não abre conexão com banco. A mesma suíte de testes (`ProdutoRepositoryContrato`) roda contra os dois adaptadores; o do PostgreSQL usa Testcontainers (`postgres:18-alpine`) e por isso exige o Docker rodando.
+
+### Auditoria de estoque
+
+Entradas, saídas e vendas concluídas publicam eventos de domínio. O módulo `auditoria` processa os eventos depois da confirmação da operação, registra código, quantidade em unidades, estoque resultante e instante em UTC, e escreve os movimentos no log em nível INFO. A venda gera um movimento por código, somando as quantidades repetidas. Operações recusadas não publicam eventos.
+
+No perfil padrão, o histórico fica em memória e o processamento é de melhor esforço. Tanto o histórico quanto a entrega de eventos dependem da instância em execução.
+
+No perfil `postgres`, o estoque e o registro da publicação (`event_publication`) são gravados na mesma transação. A auditoria grava todos os movimentos de uma operação em `movimento_estoque` e conclui a publicação em uma segunda transação. Se essa etapa falhar, a alteração do estoque continua confirmada e a publicação pendente é reenviada quando a aplicação reiniciar. As tabelas são criadas pela migration V2 do Flyway. O histórico está disponível no banco e no log.
 
 ### Docker Compose
 

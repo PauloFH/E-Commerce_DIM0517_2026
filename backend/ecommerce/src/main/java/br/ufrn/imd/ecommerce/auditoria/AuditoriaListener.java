@@ -10,7 +10,6 @@ import java.time.Instant;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Profile;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -18,7 +17,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /** Registra as movimentações depois da confirmação da operação de estoque. */
 @Component
-@Profile("!postgres")
 class AuditoriaListener {
     private static final Logger LOG = LoggerFactory.getLogger(AuditoriaListener.class);
     private final Movimentos movimentos;
