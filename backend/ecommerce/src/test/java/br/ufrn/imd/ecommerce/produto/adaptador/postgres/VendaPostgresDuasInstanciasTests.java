@@ -6,7 +6,6 @@ import br.ufrn.imd.ecommerce.compartilhado.ExcecaoNegocio;
 import br.ufrn.imd.ecommerce.produto.aplicacao.servico.ProdutoService;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
 import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ItemVenda;
-import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ItemVendido;
 import br.ufrn.imd.ecommerce.venda.aplicacao.servico.VendaService;
 import com.zaxxer.hikari.HikariDataSource;
 import java.math.BigDecimal;
@@ -68,7 +67,9 @@ class VendaPostgresDuasInstanciasTests {
                 inicio.await();
                 for (int i = 0; i < VENDAS; i++) {
                     try {
-                        for (ItemVendido item : venda.vender(pedido).itens()) {
+                        venda.vender(pedido);
+                        // conta o pedido, não a resposta: um item repetido descartado apareceria
+                        for (ItemVenda item : pedido) {
                             vendidos.get(item.codigo()).addAndGet(item.quantidade());
                         }
                     } catch (ExcecaoNegocio recusa) {
