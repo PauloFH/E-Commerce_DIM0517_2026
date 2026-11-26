@@ -29,7 +29,7 @@ class ProdutoPostgresProfileTests {
     @Test
     void profilePostgresMigraOBancoEUsaOAdaptadorPostgres() {
         assertThat(repository).isInstanceOf(ProdutoRepositoryPostgres.class);
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("1");
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("2");
         assertThat(repository.inserir(new Produto(900_001, new BigDecimal("59.90"), 0))).isTrue();
         assertThat(repository.buscar(900_001).orElseThrow().getPreco())
                 .isEqualByComparingTo("59.90");
