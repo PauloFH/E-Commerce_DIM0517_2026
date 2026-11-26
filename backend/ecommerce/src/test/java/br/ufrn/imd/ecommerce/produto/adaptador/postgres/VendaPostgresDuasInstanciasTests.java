@@ -8,6 +8,7 @@ import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
 import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ItemVenda;
 import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ItemVendido;
 import br.ufrn.imd.ecommerce.venda.aplicacao.servico.VendaService;
+import com.zaxxer.hikari.HikariDataSource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -27,14 +29,19 @@ class VendaPostgresDuasInstanciasTests {
     private static final int VENDAS = 50;
     private static final int ESTOQUE_INICIAL = 300;
 
+    private final List<HikariDataSource> pools =
+            List.of(BancoDeTeste.novoDataSource(THREADS), BancoDeTeste.novoDataSource(THREADS));
+
+    @AfterEach
+    void fecharPools() {
+        pools.forEach(HikariDataSource::close);
+    }
+
     @Test
     @Timeout(60)
     void vendasEmInstanciasDiferentesNaoDeixamEstoqueNegativoNemPerdemUnidades() throws Exception {
         BancoDeTeste.limpo();
-        var repositorios =
-                List.of(
-                        new ProdutoRepositoryPostgres(BancoDeTeste.novoDataSource(THREADS)),
-                        new ProdutoRepositoryPostgres(BancoDeTeste.novoDataSource(THREADS)));
+        var repositorios = pools.stream().map(ProdutoRepositoryPostgres::new).toList();
         repositorios.getFirst().inserir(new Produto(1, BigDecimal.ONE, ESTOQUE_INICIAL));
         repositorios.getFirst().inserir(new Produto(2, BigDecimal.TEN, ESTOQUE_INICIAL));
         var vendas =
@@ -87,6 +94,8 @@ class VendaPostgresDuasInstanciasTests {
                         .isNotNegative();
             }
         }
+        assertThat(vendidos.get(1).get()).isPositive();
+        assertThat(vendidos.get(2).get()).isPositive();
         // a procura passa do estoque: parte das vendas tem de ser recusada sem baixar nada
         assertThat(recusadas.get()).isPositive();
     }
