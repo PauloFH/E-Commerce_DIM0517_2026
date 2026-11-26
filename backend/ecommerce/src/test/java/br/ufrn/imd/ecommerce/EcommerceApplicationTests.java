@@ -2,12 +2,12 @@ package br.ufrn.imd.ecommerce;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import br.ufrn.imd.ecommerce.compartilhado.GlobalHttpExceptionHandler;
-import br.ufrn.imd.ecommerce.produto.BaixaDeEstoque;
+import br.ufrn.imd.ecommerce.compartilhado.api.GlobalHttpExceptionHandler;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.mapper.ProdutoMapper;
 import br.ufrn.imd.ecommerce.produto.adaptador.memoria.ProdutoRepositoryEmMemoria;
 import br.ufrn.imd.ecommerce.produto.aplicacao.porta.ProdutoRepository;
 import br.ufrn.imd.ecommerce.produto.aplicacao.servico.ProdutoService;
+import br.ufrn.imd.ecommerce.produto.estoque.BaixaDeEstoque;
 import br.ufrn.imd.ecommerce.venda.adaptador.api.mapper.VendaMapper;
 import br.ufrn.imd.ecommerce.venda.aplicacao.servico.VendaService;
 import jakarta.validation.Validator;

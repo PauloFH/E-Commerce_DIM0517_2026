@@ -1,6 +1,7 @@
 package br.ufrn.imd.ecommerce.venda.config;
 
-import br.ufrn.imd.ecommerce.produto.BaixaDeEstoque;
+import br.ufrn.imd.ecommerce.compartilhado.evento.PublicadorDeEventos;
+import br.ufrn.imd.ecommerce.produto.estoque.BaixaDeEstoque;
 import br.ufrn.imd.ecommerce.venda.aplicacao.servico.VendaService;
 import jakarta.validation.Validator;
 import org.springframework.context.annotation.Bean;
@@ -14,10 +15,12 @@ public class VendaConfig {
      *
      * @param baixaDeEstoque API pública do módulo produto
      * @param validator validador Jakarta fornecido pelo Boot
+     * @param publicador porta de publicação de eventos
      * @return serviço funcional
      */
     @Bean
-    public VendaService vendaService(BaixaDeEstoque baixaDeEstoque, Validator validator) {
-        return new VendaService(baixaDeEstoque, validator);
+    public VendaService vendaService(
+            BaixaDeEstoque baixaDeEstoque, Validator validator, PublicadorDeEventos publicador) {
+        return new VendaService(baixaDeEstoque, validator, publicador);
     }
 }

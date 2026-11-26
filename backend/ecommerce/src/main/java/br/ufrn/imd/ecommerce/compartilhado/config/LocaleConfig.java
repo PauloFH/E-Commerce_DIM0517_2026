@@ -1,4 +1,4 @@
-package br.ufrn.imd.ecommerce.compartilhado;
+package br.ufrn.imd.ecommerce.compartilhado.config;
 
 import java.util.List;
 import java.util.Locale;

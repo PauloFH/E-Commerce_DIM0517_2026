@@ -6,6 +6,7 @@ import br.ufrn.imd.ecommerce.venda.adaptador.api.mapper.VendaMapper;
 import br.ufrn.imd.ecommerce.venda.aplicacao.servico.VendaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Adaptador HTTP; converte transporte sem implementar regras da venda. */
@@ -27,6 +28,7 @@ public class VendaController implements VendaApi {
 
     /** {@inheritDoc} */
     @Override
+    @Transactional
     public ResponseEntity<VendaResponse> vender(VendaRequest request) {
         var resultado = service.vender(mapper.paraItens(request.itens()));
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.paraResposta(resultado));

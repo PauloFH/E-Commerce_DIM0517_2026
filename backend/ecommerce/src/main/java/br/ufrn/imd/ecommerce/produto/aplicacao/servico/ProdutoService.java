@@ -1,7 +1,8 @@
 package br.ufrn.imd.ecommerce.produto.aplicacao.servico;
 
-import br.ufrn.imd.ecommerce.produto.BaixaDeEstoque;
-import br.ufrn.imd.ecommerce.produto.ItemBaixado;
+import br.ufrn.imd.ecommerce.compartilhado.evento.PublicadorDeEventos;
+import br.ufrn.imd.ecommerce.produto.EstoqueEntrou;
+import br.ufrn.imd.ecommerce.produto.EstoqueSaiu;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.BuscarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.CadastrarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.MovimentoEstoqueDto;
@@ -11,6 +12,8 @@ import br.ufrn.imd.ecommerce.produto.dominio.excecao.DadosInvalidosException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoJaExisteException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoNaoEncontradoException;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
+import br.ufrn.imd.ecommerce.produto.estoque.BaixaDeEstoque;
+import br.ufrn.imd.ecommerce.produto.estoque.ItemBaixado;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -22,6 +25,7 @@ import java.util.Objects;
 public final class ProdutoService implements BaixaDeEstoque {
     private final ProdutoRepository repository;
     private final Validator validator;
+    private final PublicadorDeEventos publicador;
 
     /**
      * Cria o serviço fora do Spring com o Validator padrão do Jakarta Validation, compartilhado por
@@ -46,8 +50,15 @@ public final class ProdutoService implements BaixaDeEstoque {
      * @param validator executor das restrições declaradas nos DTOs
      */
     public ProdutoService(ProdutoRepository repository, Validator validator) {
+        this(repository, validator, evento -> {});
+    }
+
+    /** Cria o serviço com publicador de eventos. */
+    public ProdutoService(
+            ProdutoRepository repository, Validator validator, PublicadorDeEventos publicador) {
         this.repository = Objects.requireNonNull(repository);
         this.validator = Objects.requireNonNull(validator);
+        this.publicador = Objects.requireNonNull(publicador);
     }
 
     /**
@@ -112,6 +123,7 @@ public final class ProdutoService implements BaixaDeEstoque {
             throw new DadosInvalidosException("produto.estoque.limite.excedido", dados.codigo());
         }
 
+        publicador.publicar(new EstoqueEntrou(dados.codigo(), dados.quantidade(), estoque));
         return estoque;
     }
 
@@ -127,9 +139,12 @@ public final class ProdutoService implements BaixaDeEstoque {
     public Integer saida(MovimentoEstoqueDto dados) {
         validar(dados);
 
-        return baixarItens(Map.of(dados.codigo(), dados.quantidade()))
-                .get(dados.codigo())
-                .estoque();
+        Integer estoque =
+                baixarItens(Map.of(dados.codigo(), dados.quantidade()))
+                        .get(dados.codigo())
+                        .estoque();
+        publicador.publicar(new EstoqueSaiu(dados.codigo(), dados.quantidade(), estoque));
+        return estoque;
     }
 
     /**

@@ -1,4 +1,4 @@
-package br.ufrn.imd.ecommerce.produto;
+package br.ufrn.imd.ecommerce.produto.estoque;
 
 import java.util.Map;
 

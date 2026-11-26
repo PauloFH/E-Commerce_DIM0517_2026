@@ -10,6 +10,7 @@ import br.ufrn.imd.ecommerce.produto.aplicacao.servico.ProdutoService;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.DadosInvalidosException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Adaptador HTTP; converte transporte sem implementar regras do produto. */
@@ -46,6 +47,7 @@ public class ProdutoController implements ProdutoApi {
 
     /** {@inheritDoc} */
     @Override
+    @Transactional
     public ResponseEntity<EstoqueDto> entrada(Integer codigo, MovimentoEstoqueRequest request) {
         exigirCorpo(request);
         Integer estoque = service.entrada(mapper.paraMovimento(codigo, request));
@@ -54,6 +56,7 @@ public class ProdutoController implements ProdutoApi {
 
     /** {@inheritDoc} */
     @Override
+    @Transactional
     public ResponseEntity<EstoqueDto> saida(Integer codigo, MovimentoEstoqueRequest request) {
         exigirCorpo(request);
         Integer estoque = service.saida(mapper.paraMovimento(codigo, request));

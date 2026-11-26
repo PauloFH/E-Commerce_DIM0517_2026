@@ -3,7 +3,8 @@ package br.ufrn.imd.ecommerce.produto.aplicacao.servico;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import br.ufrn.imd.ecommerce.produto.ItemBaixado;
+import br.ufrn.imd.ecommerce.produto.EstoqueEntrou;
+import br.ufrn.imd.ecommerce.produto.EstoqueSaiu;
 import br.ufrn.imd.ecommerce.produto.adaptador.memoria.ProdutoRepositoryEmMemoria;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.BuscarProdutoDto;
 import br.ufrn.imd.ecommerce.produto.aplicacao.dto.CadastrarProdutoDto;
@@ -11,6 +12,7 @@ import br.ufrn.imd.ecommerce.produto.aplicacao.dto.MovimentoEstoqueDto;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.DadosInvalidosException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoJaExisteException;
 import br.ufrn.imd.ecommerce.produto.dominio.excecao.ProdutoNaoEncontradoException;
+import br.ufrn.imd.ecommerce.produto.estoque.ItemBaixado;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;
@@ -38,6 +40,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 class ProdutoServiceTests {
     private static ValidatorFactory factory;
     private ProdutoService service;
+    private final List<Object> eventos = new ArrayList<>();
 
     @BeforeAll
     static void criarValidator() {
@@ -51,7 +54,22 @@ class ProdutoServiceTests {
 
     @BeforeEach
     void criarServicoSemSpring() {
-        service = new ProdutoService(new ProdutoRepositoryEmMemoria(), factory.getValidator());
+        service =
+                new ProdutoService(
+                        new ProdutoRepositoryEmMemoria(), factory.getValidator(), eventos::add);
+    }
+
+    @Test
+    void publicaSomenteAsMovimentacoesConcluidas() {
+        service.cadastrar(new CadastrarProdutoDto(1, BigDecimal.ONE));
+        service.entrada(new MovimentoEstoqueDto(1, 10));
+        service.saida(new MovimentoEstoqueDto(1, 3));
+
+        assertThatThrownBy(() -> service.saida(new MovimentoEstoqueDto(1, 8)))
+                .isInstanceOf(DadosInvalidosException.class);
+        assertThatThrownBy(() -> service.entrada(new MovimentoEstoqueDto(2, 1)))
+                .isInstanceOf(ProdutoNaoEncontradoException.class);
+        assertThat(eventos).containsExactly(new EstoqueEntrou(1, 10, 10), new EstoqueSaiu(1, 3, 7));
     }
 
     @Test

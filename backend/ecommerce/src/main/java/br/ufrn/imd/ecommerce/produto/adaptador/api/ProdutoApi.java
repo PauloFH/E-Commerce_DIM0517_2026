@@ -1,6 +1,6 @@
 package br.ufrn.imd.ecommerce.produto.adaptador.api;
 
-import br.ufrn.imd.ecommerce.compartilhado.Problema;
+import br.ufrn.imd.ecommerce.compartilhado.api.Problema;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.CadastrarProdutoRequest;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.requisicao.MovimentoEstoqueRequest;
 import br.ufrn.imd.ecommerce.produto.adaptador.api.dto.resposta.EstoqueDto;

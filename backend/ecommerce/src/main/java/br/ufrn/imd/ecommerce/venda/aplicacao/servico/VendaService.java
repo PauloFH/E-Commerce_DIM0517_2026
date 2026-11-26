@@ -1,7 +1,9 @@
 package br.ufrn.imd.ecommerce.venda.aplicacao.servico;
 
-import br.ufrn.imd.ecommerce.produto.BaixaDeEstoque;
-import br.ufrn.imd.ecommerce.produto.ItemBaixado;
+import br.ufrn.imd.ecommerce.compartilhado.evento.PublicadorDeEventos;
+import br.ufrn.imd.ecommerce.produto.estoque.BaixaDeEstoque;
+import br.ufrn.imd.ecommerce.produto.estoque.ItemBaixado;
+import br.ufrn.imd.ecommerce.venda.VendaRealizada;
 import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ItemVenda;
 import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ItemVendido;
 import br.ufrn.imd.ecommerce.venda.aplicacao.dto.ResultadoVenda;
@@ -24,6 +26,7 @@ import java.util.Objects;
 public final class VendaService {
     private final BaixaDeEstoque baixaDeEstoque;
     private final Validator validator;
+    private final PublicadorDeEventos publicador;
 
     /**
      * Cria o serviço fora do Spring com o Validator padrão do Jakarta Validation, compartilhado por
@@ -48,8 +51,15 @@ public final class VendaService {
      * @param validator executor das restrições declaradas nos DTOs
      */
     public VendaService(BaixaDeEstoque baixaDeEstoque, Validator validator) {
+        this(baixaDeEstoque, validator, evento -> {});
+    }
+
+    /** Cria o serviço com publicador de eventos. */
+    public VendaService(
+            BaixaDeEstoque baixaDeEstoque, Validator validator, PublicadorDeEventos publicador) {
         this.baixaDeEstoque = Objects.requireNonNull(baixaDeEstoque);
         this.validator = Objects.requireNonNull(validator);
+        this.publicador = Objects.requireNonNull(publicador);
     }
 
     /** Lista de itens validada como um todo, para os erros apontarem a linha, como itens[1]. */
@@ -103,6 +113,14 @@ public final class VendaService {
                             baixado.estoque()));
         }
 
+        publicador.publicar(
+                new VendaRealizada(
+                        total,
+                        vendidos.stream()
+                                .map(item ->
+                                        new VendaRealizada.Item(
+                                                item.codigo(), item.quantidade(), item.estoque()))
+                                .toList()));
         return new ResultadoVenda(total, List.copyOf(vendidos));
     }
 }

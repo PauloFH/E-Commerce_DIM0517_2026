@@ -7,7 +7,11 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import br.ufrn.imd.ecommerce.compartilhado.ExcecaoNegocio;
+import br.ufrn.imd.ecommerce.compartilhado.evento.PublicadorDeEventos;
+import br.ufrn.imd.ecommerce.produto.EstoqueEntrou;
+import br.ufrn.imd.ecommerce.produto.EstoqueSaiu;
 import br.ufrn.imd.ecommerce.produto.dominio.modelo.Produto;
+import br.ufrn.imd.ecommerce.venda.VendaRealizada;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
@@ -32,7 +36,7 @@ class ArquiteturaTests {
         modules.verify();
         // contains, e não containsExactly: novos módulos não quebram o teste
         assertThat(modules.stream().map(module -> module.getIdentifier().toString()))
-                .contains("produto", "venda", "compartilhado");
+                .contains("produto", "venda", "compartilhado", "auditoria");
     }
 
     @Test
@@ -59,18 +63,21 @@ class ArquiteturaTests {
                 .should()
                 .onlyDependOnClassesThat(resideInAnyPackage("java..").or(contratoNegocio))
                 .check(CLASSES);
-        // o pacote raiz de produto é a API pública que outros módulos podem usar
+        // Os contratos públicos são expostos na raiz e em interfaces nomeadas.
         classes()
                 .that()
                 .resideInAPackage("..aplicacao..")
                 .should()
-                .onlyDependOnClassesThat()
-                .resideInAnyPackage(
-                        "java..",
-                        "jakarta.validation..",
-                        "..aplicacao..",
-                        "..dominio..",
-                        "br.ufrn.imd.ecommerce.produto")
+                .onlyDependOnClassesThat(
+                        resideInAnyPackage(
+                                        "java..",
+                                        "jakarta.validation..",
+                                        "..aplicacao..",
+                                        "..dominio..",
+                                        "br.ufrn.imd.ecommerce.produto",
+                                        "br.ufrn.imd.ecommerce.produto.estoque",
+                                        "br.ufrn.imd.ecommerce.venda")
+                                .or(type(PublicadorDeEventos.class)))
                 .check(CLASSES);
     }
 
@@ -99,7 +106,31 @@ class ArquiteturaTests {
                         "..produto.dominio..",
                         "..produto.adaptador..",
                         "..produto.config..")
-                .because("outros módulos só enxergam o pacote raiz de produto")
+                .because("outros módulos só enxergam os contratos públicos de produto")
+                .check(CLASSES);
+    }
+
+    @Test
+    void auditoriaSoConheceOsEventosPublicosDosModulosDeNegocio() {
+        var negocio = resideInAnyPackage("..produto..", "..venda..");
+        var eventos =
+                type(EstoqueEntrou.class)
+                        .or(type(EstoqueSaiu.class))
+                        .or(type(VendaRealizada.class))
+                        .or(type(VendaRealizada.Item.class));
+
+        noClasses()
+                .that(negocio)
+                .should()
+                .dependOnClassesThat()
+                .resideInAPackage("..auditoria..")
+                .check(CLASSES);
+
+        noClasses()
+                .that()
+                .resideInAPackage("..auditoria..")
+                .should()
+                .dependOnClassesThat(negocio.and(eventos.negate()))
                 .check(CLASSES);
     }
 

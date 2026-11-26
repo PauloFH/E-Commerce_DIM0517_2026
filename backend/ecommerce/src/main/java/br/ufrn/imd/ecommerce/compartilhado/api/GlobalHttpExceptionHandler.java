@@ -1,5 +1,6 @@
-package br.ufrn.imd.ecommerce.compartilhado;
+package br.ufrn.imd.ecommerce.compartilhado.api;
 
+import br.ufrn.imd.ecommerce.compartilhado.ExcecaoNegocio;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.net.URI;
