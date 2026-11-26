@@ -1,5 +1,6 @@
 package br.ufrn.imd.ecommerce.produto.config;
 
+import br.ufrn.imd.ecommerce.compartilhado.evento.PublicadorDeEventos;
 import br.ufrn.imd.ecommerce.produto.adaptador.memoria.ProdutoRepositoryEmMemoria;
 import br.ufrn.imd.ecommerce.produto.adaptador.postgres.ProdutoRepositoryPostgres;
 import br.ufrn.imd.ecommerce.produto.aplicacao.porta.ProdutoRepository;
@@ -37,10 +38,12 @@ public class ProdutoConfig {
      *
      * @param repository porta de armazenamento
      * @param validator validador Jakarta fornecido pelo Boot
+     * @param publicador porta de publicação de eventos
      * @return serviço funcional
      */
     @Bean
-    public ProdutoService produtoService(ProdutoRepository repository, Validator validator) {
-        return new ProdutoService(repository, validator);
+    public ProdutoService produtoService(
+            ProdutoRepository repository, Validator validator, PublicadorDeEventos publicador) {
+        return new ProdutoService(repository, validator, publicador);
     }
 }
